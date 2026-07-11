@@ -1,11 +1,7 @@
 <template>
   <div class="auth-page">
     <div class="auth-left">
-      <div class="auth-brand">Obor<span>Dahlan</span></div>
-      <div class="auth-tagline">Platform komunitas mahasiswa Universitas Ahmad Dahlan</div>
-      <div class="auth-images">
-        <img src="https://i.ibb.co.com/jcpp6T8/Obor-Dahlan.png" alt="Obor-Dahlan" />
-      </div>
+      <img src="/images/logo.png" alt="OborDahlan Logo" style="max-width: 470px; z-index: 1" />
     </div>
     <div class="auth-right">
       <div class="auth-form-wrap">
