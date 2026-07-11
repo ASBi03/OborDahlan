@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OborDahlan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/vue@3"></script>
+<script src="https://unpkg.com/vue-router@4/dist/vue-router.global.js"></script>
+<style>
+:root{--red:#e24b4a;--green-dark:#1a5c2e;--orange:#FF5500;--green-mid:#2d7a45;--green-light:#4caf70;--yellow:#f5c518;--yellow-light:#fde87d;--gray-bg:#f4f4f0;--gray-text:#2c2c2a;--gray-muted:#6b6b67;--gray-border:rgba(0,0,0,0.1);--radius-sm:8px;--radius-md:14px;--radius-lg:22px;--radius-xl:32px;--shadow:0 2px 12px rgba(0,0,0,0.08);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--gray-bg);color:var(--gray-text);min-height:100vh;}
+#app{min-height:100vh;}
+
+/*login*/
+.login-page{display:flex;min-height:100vh;}
+.login-left{gap:3rem;flex:1;background:var(--green-dark);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:3rem;position:relative;overflow:hidden;}
+.login-left::before{content:'';position:absolute;width:350px;height:350px;background:rgba(255,255,255,0.04);border-radius:50%;top:-80px;left:-80px;}
+.login-left::after{content:'';position:absolute;width:250px;height:250px;background:rgba(245,197,24,0.08);border-radius:50%;bottom:-60px;right:-40px;}
+.login-brand{color:white;font-family:'Space Grotesk',sans-serif;font-size:1.6rem;font-weight:700;letter-spacing:-0.5px;margin-bottom:2.5rem;z-index:1;align-self:center;text-align: center;}
+.login-brand span{color:var(--orange);}
+.login-images{position:relative;width:300px;height:300px;z-index:1;display:flex;align-items:center;justify-content:center;}
+.login-images img{height:600px;object-fit:contain;}
+.login-right{width:420px;background:var(--gray-bg);display:flex;align-items:center;justify-content:center;padding:3rem 2.5rem;}
+.login-form-wrap{width:100%;max-width:320px;}
+.login-form-wrap h2{font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;margin-bottom:0.4rem;}
+.login-form-wrap>p{color:var(--gray-muted);font-size:0.85rem;margin-bottom:2rem;}
+.form-group{margin-bottom:1rem;}
+.form-group label{display:block;font-size:0.8rem;font-weight:600;color:var(--gray-muted);margin-bottom:0.4rem;}
+.form-input{width:100%;padding:0.7rem 1rem;border:1.5px solid var(--gray-border);border-radius:var(--radius-xl);font-size:0.88rem;font-family:'Plus Jakarta Sans',sans-serif;background:white;color:var(--gray-text);transition:border-color 0.2s;outline:none;}
+.form-input:focus{border-color:var(--green-mid);}
+.btn-login{width:100%;padding:0.75rem;background:var(--green-dark);color:white;border:none;border-radius:var(--radius-xl);font-family:'Plus Jakarta Sans',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;margin-top:1rem;transition:background 0.2s,transform 0.1s;}
+.btn-login:hover{background:var(--green-mid);}
+.btn-login:active{transform:scale(0.98);}
+.login-note{text-align:center;margin-top:1rem;font-size:0.78rem;color:var(--gray-muted);}
+.login-pemberitahuan{text-align:center;margin-top:0.8rem;font-size:0.78rem;color:var(--red);}
+.login-note a{color:var(--green-mid);text-decoration:none;font-weight:600;}
+
+/* NAVBAR */
+.navbar{background:var(--green-dark);display:flex;align-items:center;padding:0 1.5rem;height:60px;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,0.2);}
+.nav-left{display:flex;align-items:center;gap:0.6rem;flex:1;}
+.nav-brand{font-family:'Space Grotesk',sans-serif;color:white;font-weight:700;font-size:1.1rem;letter-spacing:-0.3px;margin-right:0.5rem;}
+.nav-brand span{color:var(--orange);}
+.nav-icon-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.12);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:white;transition:background 0.15s;font-size:1rem;}
+.nav-icon-btn:hover{background:rgba(255,255,255,0.22);}
+.nav-right{display:flex;align-items:center;gap:0.6rem;}
+
+/* CHATBOT FLOATING */
+.chatbot-btn{position:fixed;bottom:1.5rem;right:1.5rem;width:52px;height:52px;border-radius:50%;background:var(--green-dark);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,0.25);z-index:300;transition:transform 0.2s;}
+.chatbot-btn:hover{transform:scale(1.1);}
+.chatbot-box{position:fixed;bottom:5rem;right:1.5rem;width:320px;background:white;border-radius:var(--radius-lg);box-shadow:0 8px 32px rgba(0,0,0,0.18);z-index:300;display:flex;flex-direction:column;overflow:hidden;border:1.5px solid var(--yellow);max-height:420px;}
+.chatbot-head{background:var(--green-dark);color:white;padding:0.8rem 1rem;display:flex;align-items:center;justify-content:space-between;}
+.chatbot-head span{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:0.9rem;}
+.chatbot-close{background:none;border:none;color:white;cursor:pointer;font-size:1.1rem;}
+.chatbot-messages{flex:1;overflow-y:auto;padding:0.8rem;display:flex;flex-direction:column;gap:0.5rem;min-height:200px;}
+.chatbot-bubble{max-width:85%;padding:0.5rem 0.8rem;border-radius:var(--radius-lg);font-size:0.82rem;line-height:1.5;}
+.chatbot-bubble.bot{background:var(--gray-bg);border-radius:0 var(--radius-lg) var(--radius-lg) var(--radius-lg);align-self:flex-start;}
+.chatbot-bubble.user{background:var(--green-dark);color:white;border-radius:var(--radius-lg) var(--radius-lg) 0 var(--radius-lg);align-self:flex-end;}
+.chatbot-bubble.typing{color:var(--gray-muted);font-style:italic;}
+.chatbot-input-wrap{display:flex;gap:0.5rem;padding:0.7rem;border-top:1px solid var(--gray-border);}
+.chatbot-input{flex:1;border:1.5px solid var(--gray-border);border-radius:50px;padding:0.5rem 0.9rem;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.82rem;outline:none;}
+.chatbot-input:focus{border-color:var(--green-mid);}
+
+/*layout-3kolom*/
+.home-wrap{max-width:1180px;margin:0 auto;padding:1.2rem 1.5rem;display:grid;grid-template-columns:230px 1fr 260px;gap:1.2rem;align-items:start;}
+.home-feed{min-width:0;}
+.sidebar{position:sticky;top:72px;}
+
+/*sidebar card*/
+.sidebar-card{background:white;border-radius:var(--radius-lg);padding:1rem 1.1rem;margin-bottom:1rem;box-shadow:var(--shadow);border:1px solid var(--gray-border);}
+.sidebar-card h4{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:0.82rem;color:var(--gray-muted);margin-bottom:0.8rem;text-transform:uppercase;letter-spacing:0.5px;}
+
+/*sidebar kiri-mini*/
+.mini-avatar{width:54px;height:54px;border-radius:50%;background:var(--green-dark);display:flex;align-items:center;justify-content:center;color:white;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.15rem;margin:0 auto 0.5rem;}
+.mini-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:0.92rem;text-align:center;}
+.mini-nim{font-size:0.72rem;color:var(--gray-muted);text-align:center;margin-top:2px;}
+.mini-stats{display:flex;justify-content:space-around;margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid var(--gray-border);}
+.mini-stat-val{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1rem;text-align:center;}
+.mini-stat-lbl{font-size:0.68rem;color:var(--gray-muted);text-align:center;}
+
+/*sidebar kiri-nav*/
+.sb-nav-btn{display:flex;align-items:center;gap:0.65rem;width:100%;padding:0.6rem 0.7rem;border:none;background:none;border-radius:var(--radius-md);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.85rem;color:var(--gray-text);transition:background 0.15s;font-weight:500;margin-bottom:2px;}
+.sb-nav-btn:hover{background:var(--gray-bg);}
+.sb-nav-btn.active{background:#edf7f0;color:var(--green-dark);font-weight:700;}
+.sb-nav-icon{font-size:1.1rem;width:22px;text-align:center;}
+
+/*cuaca*/
+.weather-widget{background:linear-gradient(135deg,var(--green-dark),var(--green-mid));border-radius:var(--radius-lg);padding:1rem 1.1rem;margin-bottom:1rem;color:white;box-shadow:var(--shadow);}
+.weather-row1{display:flex;justify-content:space-between;align-items:flex-start;}
+.weather-city{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:0.88rem;}
+.weather-icon{font-size:2rem;line-height:1;}
+.weather-temp{font-family:'Space Grotesk',sans-serif;font-size:2rem;font-weight:700;margin-top:0.3rem;line-height:1;}
+.weather-desc{font-size:0.76rem;opacity:0.85;text-transform:capitalize;margin-top:3px;}
+.weather-extra{display:flex;gap:0.7rem;flex-wrap:wrap;margin-top:0.6rem;padding-top:0.6rem;border-top:1px solid rgba(255,255,255,0.2);font-size:0.71rem;opacity:0.85;}
+.weather-loading{font-size:0.8rem;opacity:0.75;margin-top:0.3rem;}
+
+/*lokasi*/
+.lokasi-select{width:100%;padding:0.5rem 0.8rem;border:1.5px solid var(--gray-border);border-radius:var(--radius-xl);font-family:'Plus Jakarta Sans',sans-serif;font-size:0.8rem;outline:none;background:white;color:var(--gray-text);margin-bottom:0.5rem;cursor:pointer;}
+.lokasi-select:focus{border-color:var(--green-mid);}
+.lokasi-select:disabled{opacity:0.5;cursor:not-allowed;}
+.lokasi-hasil{font-size:0.76rem;color:var(--green-dark);font-weight:600;margin-top:0.2rem;}
+
+/*trending*/
+.trend-item{padding:0.45rem 0;border-bottom:1px solid var(--gray-border);cursor:pointer;}
+.trend-item:last-child{border-bottom:none;padding-bottom:0;}
+.trend-tag{font-size:0.82rem;font-weight:700;color:var(--green-dark);}
+.trend-count{font-size:0.7rem;color:var(--gray-muted);margin-top:1px;}
+
+/*buat post*/
+.create-post{background:white;border:1.5px solid var(--yellow);border-radius:var(--radius-lg);padding:1rem 1.2rem;margin-bottom:1rem;display:flex;align-items:center;gap:0.8rem;box-shadow:var(--shadow);cursor:pointer;}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--green-dark);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.85rem;flex-shrink:0;}
+.create-post-input{flex:1;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.88rem;color:var(--gray-muted);cursor:pointer;outline:none;background:transparent;}
+.create-post-cam{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,0.05);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;}
+
+/*post-card*/
+.post-card{background:white;border:1.5px solid var(--yellow);border-radius:var(--radius-lg);padding:1rem 1.2rem;margin-bottom:1rem;box-shadow:var(--shadow);}
+.post-card.clickable{cursor:pointer;transition:box-shadow 0.15s;}
+.post-card.clickable:hover{box-shadow:0 4px 20px rgba(0,0,0,0.12);}
+.post-header{display:flex;align-items:center;gap:0.8rem;margin-bottom:0.7rem;}
+.post-meta{flex:1;}
+.post-username{font-weight:700;font-size:0.9rem;}
+.post-time{font-size:0.76rem;color:var(--gray-muted);margin-top:1px;}
+.post-more{background:none;border:none;cursor:pointer;color:var(--gray-muted);font-size:1.2rem;padding:0.2rem 0.4rem;border-radius:var(--radius-sm);}
+.post-divider{height:1px;background:rgba(0,0,0,0.06);margin:0 0 0.7rem;}
+.post-content{font-size:0.88rem;line-height:1.6;margin-bottom:0.8rem;}
+.post-image{width:100%;border-radius:var(--radius-md);background:var(--gray-bg);border:1px solid var(--gray-border);height:180px;display:flex;align-items:center;justify-content:center;color:var(--gray-muted);font-size:0.82rem;margin-bottom:0.8rem;overflow:hidden;}
+.post-actions{display:flex;gap:0.5rem;}
+.action-btn{display:flex;align-items:center;gap:0.35rem;padding:0.4rem 0.85rem;border-radius:50px;border:1.5px solid var(--gray-border);background:none;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.8rem;font-weight:500;color:var(--gray-muted);transition:all 0.15s;}
+.action-btn:hover{background:var(--gray-bg);border-color:var(--green-mid);color:var(--green-dark);}
+.action-btn.liked{background:#fff0f0;border-color:#e24b4a;color:#a32d2d;}
+
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem;}
+.modal-box{background:white;border-radius:var(--radius-lg);width:100%;max-width:480px;padding:1.5rem;box-shadow:0 8px 40px rgba(0,0,0,0.18);max-height:90vh;overflow-y:auto;}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;}
+.modal-header h3{font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;}
+.modal-close{background:none;border:none;cursor:pointer;font-size:1.2rem;color:var(--gray-muted);padding:0.2rem 0.5rem;border-radius:var(--radius-sm);}
+.modal-textarea{width:100%;border:1.5px solid var(--gray-border);border-radius:var(--radius-md);padding:0.8rem 1rem;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.88rem;resize:none;outline:none;min-height:100px;}
+.modal-textarea:focus{border-color:var(--green-mid);}
+.modal-footer{display:flex;justify-content:flex-end;gap:0.6rem;margin-top:1rem;}
+.btn-cancel{padding:0.55rem 1.2rem;border-radius:50px;border:1.5px solid var(--gray-border);background:none;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.85rem;color:var(--gray-muted);}
+.btn-post{padding:0.55rem 1.4rem;border-radius:50px;border:none;background:var(--green-dark);color:white;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.85rem;font-weight:600;}
+.btn-post:hover{background:var(--green-mid);}
+
+/*komen*/
+.comment-item{display:flex;gap:0.7rem;margin-bottom:0.9rem;}
+.comment-bubble{background:var(--gray-bg);border-radius:0 var(--radius-md) var(--radius-md) var(--radius-md);padding:0.6rem 0.9rem;flex:1;}
+.comment-name{font-weight:700;font-size:0.8rem;margin-bottom:0.2rem;}
+.comment-text{font-size:0.82rem;line-height:1.5;}
+.comment-time{font-size:0.72rem;color:var(--gray-muted);margin-top:0.3rem;}
+.comment-input-wrap{display:flex;gap:0.6rem;align-items:center;margin-top:1rem;border-top:1px solid var(--gray-border);padding-top:1rem;}
+.comment-input{flex:1;border:1.5px solid var(--gray-border);border-radius:50px;padding:0.55rem 1rem;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.85rem;outline:none;}
+.comment-input:focus{border-color:var(--green-mid);}
+.btn-send{width:36px;height:36px;border-radius:50%;background:var(--green-dark);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:white;flex-shrink:0;}
+.btn-send:hover{background:var(--green-mid);}
+
+/*chat*/
+.main-layout{max-width:720px;margin:0 auto;padding:1.2rem 1rem;}
+.chat-item{display:flex;align-items:center;gap:0.9rem;padding:0.9rem 1rem;background:white;border-radius:var(--radius-md);margin-bottom:0.6rem;box-shadow:var(--shadow);cursor:pointer;border:1px solid transparent;transition:border-color 0.15s;}
+.chat-item:hover{border-color:var(--yellow);}
+.chat-item.unread .chat-name{font-weight:700;}
+.chat-item.unread .chat-preview{color:var(--gray-text);font-weight:500;}
+.chat-avatar{width:46px;height:46px;border-radius:50%;background:var(--green-dark);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.9rem;flex-shrink:0;}
+.chat-info{flex:1;min-width:0;}
+.chat-name{font-size:0.9rem;}
+.chat-preview{font-size:0.78rem;color:var(--gray-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.chat-meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
+.chat-time{font-size:0.72rem;color:var(--gray-muted);}
+.chat-badge{background:var(--green-dark);color:white;border-radius:50px;font-size:0.68rem;font-weight:700;padding:1px 7px;min-width:18px;text-align:center;}
+.chat-room{display:flex;flex-direction:column;height:calc(100vh - 60px);}
+.chat-messages{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:0.6rem;padding-bottom:80px;}
+.bubble-wrap{display:flex;}
+.bubble-wrap.mine{justify-content:flex-end;}
+.bubble{max-width:72%;padding:0.6rem 0.9rem;border-radius:var(--radius-lg);font-size:0.85rem;line-height:1.5;}
+.bubble.theirs{background:white;border:1px solid var(--gray-border);border-radius:0 var(--radius-lg) var(--radius-lg) var(--radius-lg);}
+.bubble.mine{background:var(--green-dark);color:white;border-radius:var(--radius-lg) var(--radius-lg) 0 var(--radius-lg);}
+.bubble-time{font-size:0.68rem;margin-top:3px;}
+.bubble.mine .bubble-time{color:rgba(255,255,255,0.6);text-align:right;}
+.bubble.theirs .bubble-time{color:var(--gray-muted);}
+.chat-input-bar{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid var(--gray-border);padding:0.7rem 1rem;display:flex;gap:0.6rem;align-items:center;z-index:99;}
+.chat-input-bar input{flex:1;border:1.5px solid var(--gray-border);border-radius:50px;padding:0.6rem 1rem;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.88rem;outline:none;}
+.chat-input-bar input:focus{border-color:var(--green-mid);}
+
+/*profil*/
+.profile-cover{height:140px;background:linear-gradient(135deg,var(--green-dark),var(--green-mid));}
+.profile-info-wrap{background:white;border-radius:var(--radius-lg) var(--radius-lg) 0 0;margin-top:-30px;padding:0 1.2rem 1.2rem;position:relative;z-index:1;}
+.profile-avatar-lg{width:72px;height:72px;border-radius:50%;background:var(--green-dark);border:3px solid white;margin-top:-36px;display:flex;align-items:center;justify-content:center;color:white;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.4rem;}
+.profile-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.1rem;margin-top:0.6rem;}
+.profile-nim{font-size:0.8rem;color:var(--gray-muted);margin-top:0.2rem;}
+.profile-stats{display:flex;gap:1.5rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--gray-border);}
+.stat-item{text-align:center;}
+.stat-val{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.1rem;}
+.stat-lbl{font-size:0.75rem;color:var(--gray-muted);}
+.lokasi-card{background:white;border:1.5px solid var(--yellow);border-radius:var(--radius-lg);padding:1rem 1.2rem;margin:1rem 0;box-shadow:var(--shadow);}
+.lokasi-card h4{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:0.9rem;margin-bottom:0.8rem;}
+
+.fade-enter-active,.fade-leave-active{transition:opacity 0.18s;}
+.fade-enter-from,.fade-leave-to{opacity:0;}
+
+@media(max-width:960px){
+  .home-wrap{grid-template-columns:1fr;padding:0.8rem;}
+  .sidebar-left,.sidebar-right{display:none;}
+  .home-feed{padding-bottom:70px;}
+}
+@media(max-width:500px){
+  .login-page{flex-direction:column;}
+  .login-left{min-height:260px;padding:2rem;}
+  .login-right{width:100%;padding:2rem 1.5rem;}
+  .login-images{width:220px;height:220px;}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <router-view v-slot="{ Component }">
+    <transition name="fade" mode="out-in">
+      <component :is="Component" />
+    </transition>
+  </router-view>
+</div>
+<script>
+const { createApp, ref, computed, onMounted } = Vue;
+const { createRouter, createWebHashHistory } = VueRouter;
+
+const WEATHER_API_KEY = 'e5388f45213531c43b93b7130d9f3529';
+const WEATHER_CITY = 'Yogyakarta';
+const EMSIFA_BASE = 'https://www.emsifa.com/api-wilayah-indonesia/api';
+
+const currentUser = ref({ name: 'Gustagus', nim: '2300016092', initials: 'G' });
+
+const posts = ref([
+  { id:1, user:{name:'Lily_Put',initials:'LP',nim:'2300011001'}, time:'2 jam lalu', content:'Halo semua! Ada yang mau join kelompok belajar Pemrograman Web bareng nggak? Rencananya mau tiap Sabtu pagi di perpus lantai 2. DM yaa 🙌', image:null, likes:14, comments:2, liked:false, commentList:[
+    {id:1,user:{name:'NapNap',initials:'N'},text:'Aku mau ikut! Sabtu jam berapa?',time:'1 jam lalu'},
+    {id:2,user:{name:'Keysrut',initials:'K'},text:'Count me in juga 🙋',time:'45 menit lalu'},
+  ]},
+  { id:2, user:{name:'NapNap',initials:'N',nim:'2300012042'}, time:'5 jam lalu', content:'Tugas Basis Data semester ini susah banget parah 😭 ada yang udah selesai ERD-nya? Minta hint dong pleaseeee. Btw deadline-nya besok jam 8 pagi.', image:null, likes:27, comments:1, liked:false, commentList:[
+    {id:1,user:{name:'Lily_Put',initials:'LP'},text:'Aku juga belum 😭 yuk kerjain bareng di Discord',time:'4 jam lalu'},
+  ]},
+  { id:3, user:{name:'Keysrut',initials:'K',nim:'2300013078'}, time:'1 hari lalu', content:'Foto dari Seminar Nasional kemarin! Seru banget pembicaranya. Banyak insight tentang AI dan masa depan dunia kerja buat kita para mahasiswa IT.', image:true, likes:63, comments:0, liked:false, commentList:[] },
+]);
+
+const conversations = ref([
+  { id:1, user:{name:'Lily_Put',initials:'LP'}, preview:'Aku mau ikut! Sabtu jam berapa?', time:'1 jam lalu', unread:2, messages:[
+    {id:1,from:'them',text:'Hei Gustagus, soal kelompok belajar tadi...',time:'2 jam lalu'},
+    {id:2,from:'them',text:'Aku mau ikut! Sabtu jam berapa?',time:'1 jam lalu'},
+  ]},
+  { id:2, user:{name:'NapNap',initials:'N'}, preview:'Yuk kerjain bareng di Discord malam ini', time:'3 jam lalu', unread:0, messages:[
+    {id:1,from:'me',text:'Nap, ERD-mu udah sampai mana?',time:'4 jam lalu'},
+    {id:2,from:'them',text:'Belum mulai 😭',time:'3 jam lalu'},
+    {id:3,from:'them',text:'Yuk kerjain bareng di Discord malam ini',time:'3 jam lalu'},
+  ]},
+  { id:3, user:{name:'Keysrut',initials:'K'}, preview:'Sip siap! Nanti aku share fotonya', time:'Kemarin', unread:0, messages:[
+    {id:1,from:'me',text:'Key, seminar kemarin seru banget ya!',time:'Kemarin'},
+    {id:2,from:'them',text:'Iya dong! Pembicaranya keren banget',time:'Kemarin'},
+    {id:4,from:'them',text:'Sip siap! Nanti aku share fotonya',time:'Kemarin'},
+  ]},
+]);
+
+/*hal-login*/
+const LoginPage = {
+  template:`
+  <div class="login-page">
+    <div class="login-left">
+      <div class="login-brand">Obor<span>Dahlan</span></div>
+      <div class="login-images"><img src="https://i.ibb.co.com/jcpp6T8/Obor-Dahlan.png" alt="Obor-Dahlan" alt="Obor-Dahlan"/></div>
+    </div>
+    <div class="login-right">
+      <div class="login-form-wrap">
+        <h2>Masuk ke OborDahlan</h2>
+        <p>Platform komunitas mahasiswa UAD</p>
+        <div class="form-group"><label>Email UAD</label><input v-model="email" class="form-input" type="email" placeholder="nim@webmail.uad.ac.id"/></div>
+        <div class="form-group"><label>Password</label><input v-model="password" class="form-input" type="password" placeholder="••••••••" @keyup.enter="doLogin"/></div>
+        <p class="login-pemberitahuan">Bisa langsung masuk, belum butuh akun</p>
+        <button class="btn-login" @click="doLogin">Masuk</button>
+        <p class="login-note">Belum punya akun? <a href="#">Daftar di sini</a></p>
+      </div>
+    </div>
+  </div>`,
+  setup(){
+    const router=VueRouter.useRouter();
+    const email=ref(''),password=ref('');
+    function doLogin(){router.push('/home');}
+    return{email,password,doLogin};
+  }
+};
+
+/*hal-home*/
+const HomePage = {
+  template:`
+  <div>
+    <nav class="navbar">
+      <div class="nav-left">
+        <div class="nav-brand">Obor<span>Dahlan</span></div>
+      </div>
+      <div class="nav-right">
+        <button class="nav-icon-btn" @click="goPersan" title="Pesan">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </button>
+        <button class="nav-icon-btn" title="Notifikasi">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        </button>
+        <button class="nav-icon-btn" @click="goProfile">
+          <span style="font-size:0.75rem;font-weight:700">{{ user.initials }}</span>
+        </button>
+      </div>
+    </nav>
+
+    <div class="home-wrap">
+      <!-- KOLOM KIRI -->
+      <div class="sidebar sidebar-left">
+        <div class="sidebar-card">
+          <div class="mini-avatar">{{ user.initials }}</div>
+          <div class="mini-name">{{ user.name }}</div>
+          <div class="mini-nim">{{ user.nim }}</div>
+          <div class="mini-stats">
+            <div><div class="mini-stat-val">{{ userPostCount }}</div><div class="mini-stat-lbl">Post</div></div>
+            <div><div class="mini-stat-val">128</div><div class="mini-stat-lbl">Pengikut</div></div>
+            <div><div class="mini-stat-val">74</div><div class="mini-stat-lbl">Ikuti</div></div>
+          </div>
+        </div>
+        <div class="sidebar-card" style="padding:0.6rem 0.5rem">
+          <button class="sb-nav-btn active"><span class="sb-nav-icon">🏠</span> Beranda</button>
+          <button class="sb-nav-btn" @click="goPersan"><span class="sb-nav-icon">💬</span> Pesan</button>
+          <button class="sb-nav-btn"><span class="sb-nav-icon">🔍</span> Cari</button>
+          <button class="sb-nav-btn" @click="goProfile"><span class="sb-nav-icon">👤</span> Profil Saya</button>
+          <button class="sb-nav-btn"><span class="sb-nav-icon">🔔</span> Notifikasi</button>
+          <button class="sb-nav-btn"><span class="sb-nav-icon">📌</span> Tersimpan</button>
+        </div>
+      </div>
+
+      <!-- KOLOM TENGAH - FEED -->
+      <div class="home-feed">
+        <div class="create-post" @click="showModal=true">
+          <div class="avatar">{{ user.initials }}</div>
+          <input class="create-post-input" placeholder="Bagikan sesuatu ke komunitas..." readonly/>
+          <button class="create-post-cam">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </button>
+        </div>
+        <div v-for="post in posts" :key="post.id" class="post-card clickable" @click="goDetail(post.id)">
+          <div class="post-header">
+            <div class="avatar">{{ post.user.initials }}</div>
+            <div class="post-meta">
+              <div class="post-username">{{ post.user.name }}</div>
+              <div class="post-time">{{ post.time }} · {{ post.user.nim }}</div>
+            </div>
+            <button class="post-more" @click.stop>⋯</button>
+          </div>
+          <div class="post-divider"></div>
+          <p class="post-content">{{ post.content }}</p>
+          <div v-if="post.image" class="post-image"><span>📷 Foto</span></div>
+          <div class="post-actions">
+            <button class="action-btn" :class="{liked:post.liked}" @click.stop="toggleLike(post)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              {{ post.likes }}
+            </button>
+            <button class="action-btn" @click.stop="goDetail(post.id)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              {{ post.comments }}
+            </button>
+            <button class="action-btn" @click.stop>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              Bagikan
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- KOLOM KANAN -->
+      <div class="sidebar sidebar-right">
+        <!-- CUACA (OpenWeather API) -->
+        <div class="weather-widget">
+          <div class="weather-row1">
+            <div>
+              <div class="weather-city">📍 {{ weather.city || WEATHER_CITY }}</div>
+              <div v-if="weather.loading" class="weather-loading">Memuat cuaca...</div>
+              <div v-else-if="weather.error" class="weather-loading" style="color:#fde87d">{{ weather.error }}</div>
+              <div v-else>
+                <div class="weather-temp">{{ weather.temp }}°C</div>
+                <div class="weather-desc">{{ weather.desc }}</div>
+              </div>
+            </div>
+            <div class="weather-icon" v-if="!weather.loading">{{ weather.icon }}</div>
+          </div>
+          <div class="weather-extra" v-if="!weather.loading && !weather.error">
+            <span>💧 {{ weather.humidity }}%</span>
+            <span>🌬️ {{ weather.wind }} m/s</span>
+          </div>
+        </div>
+
+        <!-- TRENDING -->
+        <div class="sidebar-card">
+          <h4>🔥 Trending di Kampus</h4>
+          <div v-for="t in trending" :key="t.tag" class="trend-item">
+            <div>
+              <div class="trend-tag">#{{ t.tag }}</div>
+              <div class="trend-count">{{ t.count }} postingan</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL -->
+    <div v-if="showModal" class="modal-overlay" @click.self="showModal=false">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3>Buat Postingan</h3>
+          <button class="modal-close" @click="showModal=false">✕</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.8rem;margin-bottom:1rem">
+          <div class="avatar">{{ user.initials }}</div>
+          <div>
+            <div style="font-weight:700;font-size:0.88rem">{{ user.name }}</div>
+            <div style="font-size:0.75rem;color:var(--gray-muted)">{{ user.nim }}</div>
+          </div>
+        </div>
+        <textarea class="modal-textarea" v-model="newPost" placeholder="Apa yang ingin kamu bagikan?" rows="4"></textarea>
+        <div class="modal-footer">
+          <button class="btn-cancel" @click="showModal=false">Batal</button>
+          <button class="btn-post" @click="submitPost">Posting</button>
+        </div>
+      </div>
+    </div>
+  </div>`,
+  setup(){
+    const router=VueRouter.useRouter();
+    const showModal=ref(false),newPost=ref('');
+    const user=currentUser;
+    const weather=ref({loading:true,error:null,temp:'',desc:'',humidity:'',wind:'',icon:'🌤️',city:''});
+    const provinsi=ref([]),kota=ref([]),selectedProv=ref(''),selectedKota=ref(''),loadingProv=ref(true);
+    const namaProv=computed(()=>provinsi.value.find(p=>p.id===selectedProv.value)?.name||'');
+    const namaKota=computed(()=>kota.value.find(k=>k.id===selectedKota.value)?.name||'');
+    const userPostCount=computed(()=>posts.value.filter(p=>p.user.name===user.value.name).length);
+    const trending=ref([
+      {tag:'PemrogramanWeb',count:42},{tag:'KuliahIT',count:38},{tag:'UAD2025',count:31},
+      {tag:'BasisData',count:27},{tag:'SeminarNasional',count:19},
+    ]);
+
+    onMounted(async()=>{
+      // OpenWeather
+      if(!WEATHER_API_KEY){
+      weather.value={loading:false,error:'Masukkan API key',temp:'--',desc:'',humidity:'--',wind:'--',icon:'🌤️',city:WEATHER_CITY};
+      } else {
+        try{
+          const res=await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${WEATHER_CITY}&appid=${WEATHER_API_KEY}&units=metric&lang=id`);
+          if(!res.ok)throw new Error();
+          const d=await res.json();
+          const im={'Clear':'☀️','Clouds':'⛅','Rain':'🌧️','Drizzle':'🌦️','Thunderstorm':'⛈️','Snow':'❄️','Mist':'🌫️','Haze':'🌫️'};
+          weather.value={loading:false,error:null,temp:Math.round(d.main.temp),desc:d.weather[0].description,humidity:d.main.humidity,wind:d.wind.speed,icon:im[d.weather[0].main]||'🌤️',city:d.name};
+        }catch{weather.value={loading:false,error:'Cuaca tidak tersedia',temp:'--',desc:'',humidity:'--',wind:'--',icon:'🌤️',city:WEATHER_CITY};}
+      }
+      // emsifa
+      try{
+        const res=await fetch(`${EMSIFA_BASE}/provinces.json`);
+        provinsi.value=await res.json();
+      }catch(e){}finally{loadingProv.value=false;}
+    });
+
+    async function onProvChange(){
+      selectedKota.value='';kota.value=[];
+      if(!selectedProv.value)return;
+      try{const res=await fetch(`${EMSIFA_BASE}/regencies/${selectedProv.value}.json`);kota.value=await res.json();}catch(e){}
+    }
+
+    function toggleLike(post){post.liked=!post.liked;post.likes+=post.liked?1:-1;}
+    function submitPost(){
+      if(!newPost.value.trim())return;
+      posts.value.unshift({id:Date.now(),user:{name:user.value.name,initials:user.value.initials,nim:user.value.nim},time:'Baru saja',content:newPost.value,image:null,likes:0,comments:0,liked:false,commentList:[]});
+      newPost.value='';showModal.value=false;
+    }
+    function goProfile(){router.push('/profil');}
+    function goPersan(){router.push('/pesan');}
+    function goDetail(id){router.push('/post/'+id);}
+    return{showModal,newPost,user,posts,weather,WEATHER_CITY,provinsi,kota,selectedProv,selectedKota,loadingProv,namaProv,namaKota,userPostCount,trending,onProvChange,toggleLike,submitPost,goProfile,goPersan,goDetail};
+  }
+};
+
+/*detail-post*/
+const DetailPage = {
+  template:`
+  <div>
+    <nav class="navbar">
+      <div class="nav-left">
+        <button class="nav-icon-btn" @click="goBack"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
+        <div class="nav-brand" style="margin-left:0.4rem">Postingan</div>
+      </div>
+    </nav>
+    <div class="page-content main-layout" v-if="post">
+      <div class="post-card">
+        <div class="post-header">
+          <div class="avatar">{{ post.user.initials }}</div>
+          <div class="post-meta"><div class="post-username">{{ post.user.name }}</div><div class="post-time">{{ post.time }} · {{ post.user.nim }}</div></div>
+        </div>
+        <div class="post-divider"></div>
+        <p class="post-content">{{ post.content }}</p>
+        <div v-if="post.image" class="post-image"><span>📷 Foto</span></div>
+        <div class="post-actions">
+          <button class="action-btn" :class="{liked:post.liked}" @click="toggleLike">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            {{ post.likes }}
+          </button>
+          <button class="action-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> {{ post.comments }}</button>
+        </div>
+      </div>
+      <div style="background:white;border-radius:var(--radius-lg);padding:1.2rem;box-shadow:var(--shadow);border:1.5px solid var(--yellow)">
+        <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:0.95rem;margin-bottom:1rem">Komentar ({{ post.commentList.length }})</div>
+        <div v-if="post.commentList.length===0" style="text-align:center;padding:1.5rem;color:var(--gray-muted);font-size:0.85rem">Belum ada komentar. Jadilah yang pertama! 💬</div>
+        <div v-for="c in post.commentList" :key="c.id" class="comment-item">
+          <div class="avatar" style="width:32px;height:32px;font-size:0.75rem;flex-shrink:0">{{ c.user.initials }}</div>
+          <div class="comment-bubble"><div class="comment-name">{{ c.user.name }}</div><div class="comment-text">{{ c.text }}</div><div class="comment-time">{{ c.time }}</div></div>
+        </div>
+        <div class="comment-input-wrap">
+          <div class="avatar" style="width:32px;height:32px;font-size:0.75rem;flex-shrink:0">{{ user.initials }}</div>
+          <input class="comment-input" v-model="newComment" placeholder="Tulis komentar..." @keyup.enter="submitComment"/>
+          <button class="btn-send" @click="submitComment"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <div v-else class="main-layout" style="text-align:center;padding:3rem;color:var(--gray-muted)">Postingan tidak ditemukan.</div>
+  </div>`,
+  setup(){
+    const router=VueRouter.useRouter(),route=VueRouter.useRoute();
+    const newComment=ref(''),user=currentUser;
+    const post=computed(()=>posts.value.find(p=>p.id==route.params.id));
+    function toggleLike(){if(!post.value)return;post.value.liked=!post.value.liked;post.value.likes+=post.value.liked?1:-1;}
+    function submitComment(){
+      if(!newComment.value.trim()||!post.value)return;
+      post.value.commentList.push({id:Date.now(),user:{name:user.value.name,initials:user.value.initials},text:newComment.value,time:'Baru saja'});
+      post.value.comments++;newComment.value='';
+    }
+    function goBack(){router.push('/home');}
+    return{post,newComment,user,toggleLike,submitComment,goBack};
+  }
+};
+
+/*hal-chat*/
+const PesanPage = {
+  template:`
+  <div>
+    <nav class="navbar">
+      <div class="nav-left">
+        <button class="nav-icon-btn" @click="goBack"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
+        <div class="nav-brand" style="margin-left:0.4rem">Pesan</div>
+      </div>
+    </nav>
+    <div class="page-content main-layout">
+      <div v-for="conv in conversations" :key="conv.id" class="chat-item" :class="{unread:conv.unread>0}" @click="goChat(conv.id)">
+        <div class="chat-avatar">{{ conv.user.initials }}</div>
+        <div class="chat-info"><div class="chat-name">{{ conv.user.name }}</div><div class="chat-preview">{{ conv.preview }}</div></div>
+        <div class="chat-meta"><div class="chat-time">{{ conv.time }}</div><div v-if="conv.unread>0" class="chat-badge">{{ conv.unread }}</div></div>
+      </div>
+    </div>
+  </div>`,
+  setup(){
+    const router=VueRouter.useRouter();
+    function goBack(){router.push('/home');}
+    function goProfil(){router.push('/profil');}
+    function goChat(id){router.push('/pesan/'+id);}
+    return{conversations,goBack,goProfil,goChat};
+  }
+};
+
+/*chat-room*/
+const ChatPage = {
+  template:`
+  <div>
+    <nav class="navbar">
+      <div class="nav-left">
+        <button class="nav-icon-btn" @click="goBack"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
+        <div class="chat-avatar" style="width:32px;height:32px;font-size:0.78rem;margin-left:0.4rem" v-if="conv">{{ conv.user.initials }}</div>
+        <div class="nav-brand" style="margin-left:0.5rem" v-if="conv">{{ conv.user.name }}</div>
+      </div>
+    </nav>
+    <div class="chat-room" v-if="conv">
+      <div class="chat-messages" ref="msgBox">
+        <div v-for="msg in conv.messages" :key="msg.id" class="bubble-wrap" :class="{mine:msg.from==='me'}">
+          <div class="bubble" :class="msg.from==='me'?'mine':'theirs'">{{ msg.text }}<div class="bubble-time">{{ msg.time }}</div></div>
+        </div>
+      </div>
+      <div class="chat-input-bar">
+        <input v-model="newMsg" placeholder="Ketik pesan..." @keyup.enter="sendMsg"/>
+        <button class="btn-send" @click="sendMsg"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+      </div>
+    </div>
+  </div>`,
+  setup(){
+    const router=VueRouter.useRouter(),route=VueRouter.useRoute();
+    const newMsg=ref(''),msgBox=ref(null);
+    const conv=computed(()=>conversations.value.find(c=>c.id==route.params.id));
+    function sendMsg(){
+      if(!newMsg.value.trim()||!conv.value)return;
+      conv.value.messages.push({id:Date.now(),from:'me',text:newMsg.value,time:'Baru saja'});
+      conv.value.preview=newMsg.value;conv.value.unread=0;newMsg.value='';
+      Vue.nextTick(()=>{if(msgBox.value)msgBox.value.scrollTop=msgBox.value.scrollHeight;});
+    }
+    function goBack(){router.push('/pesan');}
+    return{conv,newMsg,msgBox,sendMsg,goBack};
+  }
+};
+
+/*profil */
+const ProfilePage = {
+  template:`
+  <div>
+    <nav class="navbar">
+      <div class="nav-left">
+        <button class="nav-icon-btn" @click="goBack"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
+        <div class="nav-brand" style="margin-left:0.4rem">Profil</div>
+      </div>
+    </nav>
+    <div class="page-content">
+      <div class="profile-cover"></div>
+      <div class="profile-info-wrap main-layout" style="padding-top:0">
+        <div class="profile-avatar-lg">{{ user.initials }}</div>
+        <div class="profile-name">{{ user.name }}</div>
+        <div class="profile-nim">NIM: {{ user.nim }} · Sistem Informasi</div>
+        <div class="profile-stats">
+          <div class="stat-item"><div class="stat-val">{{ userPostCount }}</div><div class="stat-lbl">Postingan</div></div>
+          <div class="stat-item"><div class="stat-val">128</div><div class="stat-lbl">Pengikut</div></div>
+          <div class="stat-item"><div class="stat-val">74</div><div class="stat-lbl">Mengikuti</div></div>
+        </div>
+      </div>
+      <div class="main-layout">
+        <div v-for="post in userPosts" :key="post.id" class="post-card clickable" @click="goDetail(post.id)">
+          <div class="post-header">
+            <div class="avatar">{{ post.user.initials }}</div>
+            <div class="post-meta"><div class="post-username">{{ post.user.name }}</div><div class="post-time">{{ post.time }}</div></div>
+          </div>
+          <div class="post-divider"></div>
+          <p class="post-content">{{ post.content }}</p>
+          <div class="post-actions">
+            <button class="action-btn" :class="{liked:post.liked}" @click.stop="toggleLike(post)">❤️ {{ post.likes }}</button>
+            <button class="action-btn" @click.stop="goDetail(post.id)">💬 {{ post.comments }}</button>
+          </div>
+        </div>
+        <div v-if="userPosts.length===0" style="text-align:center;padding:3rem;color:var(--gray-muted);font-size:0.88rem">Belum ada postingan.</div>
+      </div>
+    </div>
+  </div>`,
+  setup(){
+    const router=VueRouter.useRouter(),user=currentUser;
+    const userPosts=computed(()=>posts.value.filter(p=>p.user.name===user.value.name));
+    const userPostCount=computed(()=>userPosts.value.length);
+    const provinsi=ref([]),kota=ref([]),selectedProv=ref(''),selectedKota=ref(''),loadingProv=ref(true);
+    const namaProv=computed(()=>provinsi.value.find(p=>p.id===selectedProv.value)?.name||'');
+    const namaKota=computed(()=>kota.value.find(k=>k.id===selectedKota.value)?.name||'');
+    onMounted(async()=>{
+      try{const res=await fetch(`${EMSIFA_BASE}/provinces.json`);provinsi.value=await res.json();}catch(e){}finally{loadingProv.value=false;}
+    });
+    async function onProvChange(){
+      selectedKota.value='';kota.value=[];
+      if(!selectedProv.value)return;
+      try{const res=await fetch(`${EMSIFA_BASE}/regencies/${selectedProv.value}.json`);kota.value=await res.json();}catch(e){}
+    }
+    function goBack(){router.push('/home');}
+    function goPersan(){router.push('/pesan');}
+    function goDetail(id){router.push('/post/'+id);}
+    function toggleLike(post){post.liked=!post.liked;post.likes+=post.liked?1:-1;}
+    return{user,userPosts,userPostCount,provinsi,kota,selectedProv,selectedKota,loadingProv,namaProv,namaKota,onProvChange,goBack,goPersan,goDetail,toggleLike};
+  }
+};
+
+const routes=[
+  {path:'/',redirect:'/login'},{path:'/login',component:LoginPage},
+  {path:'/home',component:HomePage},{path:'/post/:id',component:DetailPage},
+  {path:'/pesan',component:PesanPage},{path:'/pesan/:id',component:ChatPage},
+  {path:'/profil',component:ProfilePage},
+];
+const router=createRouter({history:createWebHashHistory(),routes});
+createApp({}).use(router).mount('#app');
+</script>
+</body>
+</html>
