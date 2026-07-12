@@ -1236,8 +1236,134 @@ body {
     display: none;
   }
   .home-feed {
-    padding-bottom: 70px;
+    padding-bottom: 80px;
   }
+}
+
+/* bottom nav mobile */
+.bottom-nav {
+  display: none;
+}
+@media (max-width: 960px) {
+  .bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1px solid var(--gray-border);
+    padding: 0.4rem 0;
+    z-index: 100;
+    justify-content: space-around;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
+  }
+  .bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.3rem 0.8rem;
+    border-radius: var(--radius-sm);
+    color: var(--gray-muted);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.65rem;
+    transition: color 0.15s;
+  }
+  .bottom-nav-item.active {
+    color: var(--green-dark);
+  }
+  .bottom-nav-item.active svg {
+    stroke: var(--green-dark);
+    fill: rgba(26, 92, 46, 0.1);
+  }
+}
+
+/* lowongan */
+.lowongan-card {
+  background: white;
+  border: 1.5px solid var(--yellow);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.2rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow);
+}
+.lowongan-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+.lowongan-type {
+  margin-left: auto;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 50px;
+  background: #edf7f0;
+  color: var(--green-dark);
+  white-space: nowrap;
+}
+.lowongan-type.parttime {
+  background: #fff8e1;
+  color: #e6a817;
+}
+.lowongan-type.freelance {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+.lowongan-type.internship {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+.lowongan-body {
+  margin-bottom: 0.8rem;
+}
+.lowongan-position {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 0.4rem;
+}
+.lowongan-desc {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--gray-text);
+  margin-bottom: 0.6rem;
+}
+.lowongan-meta {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+.lowongan-tag {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  color: var(--gray-muted);
+}
+.lowongan-footer {
+  border-top: 1px solid var(--gray-border);
+  padding-top: 0.8rem;
+}
+.btn-apply {
+  padding: 0.5rem 1.2rem;
+  background: var(--orange);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-apply:hover {
+  background: #e64a00;
 }
 @media (max-width: 500px) {
   .login-page,
@@ -1246,20 +1372,19 @@ body {
   }
   .login-left,
   .auth-left {
-    min-height: 240px;
+    min-height: 200px;
     padding: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .login-left img,
+  .auth-left img {
+    max-width: 180px !important;
   }
   .login-right,
   .auth-right {
     width: 100%;
     padding: 2rem 1.5rem;
-  }
-  .login-images,
-  .auth-images {
-    width: 180px;
-    height: 180px;
-  }
-  .auth-images img {
-    height: 350px;
   }
 }

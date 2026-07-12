@@ -71,6 +71,7 @@
         </div>
       </div>
     </div>
+    <BottomNav />
   </div>
 </template>
 
@@ -79,6 +80,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
 import { usePosts } from '@/composables/usePosts'
+import BottomNav from '@/components/BottomNav.vue'
 
 const router = useRouter()
 const { currentUser: user, logout, fetchFollowCounts } = useAuth()

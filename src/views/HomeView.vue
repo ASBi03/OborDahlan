@@ -192,6 +192,7 @@
         </div>
       </div>
     </div>
+    <BottomNav />
   </div>
 </template>
 
@@ -201,6 +202,7 @@ import { useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
 import { usePosts } from '@/composables/usePosts'
 import { useChat } from '@/composables/useChat'
+import BottomNav from '@/components/BottomNav.vue'
 import { WEATHER_API_KEY, WEATHER_CITY } from '@/data/store'
 
 const router = useRouter()

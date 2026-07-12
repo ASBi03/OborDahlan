@@ -33,7 +33,7 @@
                 v-model="name"
                 class="form-input"
                 type="text"
-                placeholder="Gustagus"
+                placeholder="Username"
                 required
               />
             </div>
@@ -50,7 +50,7 @@
                 v-model="email"
                 class="form-input"
                 type="email"
-                placeholder="2300016092@webmail.uad.ac.id"
+                placeholder="email@webmail.uad.ac.id"
                 required
               />
             </div>
@@ -165,10 +165,15 @@ async function handleRegister() {
       router.push('/login')
     }, 2000)
   } catch (err) {
-    if (err.message.includes('already registered')) {
+    const msg = err?.message || JSON.stringify(err) || ''
+    if (msg.includes('already registered') || msg.includes('already been registered')) {
       error.value = 'Email sudah terdaftar'
+    } else if (msg.includes('rate limit')) {
+      error.value = 'Terlalu banyak percobaan. Coba lagi dalam beberapa menit.'
+    } else if (msg.includes('Valid email')) {
+      error.value = 'Format email tidak valid'
     } else {
-      error.value = err.message || 'Terjadi kesalahan saat registrasi'
+      error.value = msg || 'Terjadi kesalahan saat registrasi'
     }
   } finally {
     isLoading.value = false

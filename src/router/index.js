@@ -5,6 +5,7 @@ import HomeView from '@/views/HomeView.vue'
 import DetailView from '@/views/DetailView.vue'
 import PesanView from '@/views/PesanView.vue'
 import ChatView from '@/views/ChatView.vue'
+import LowonganView from '@/views/LowonganView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 
 const routes = [
@@ -15,6 +16,7 @@ const routes = [
   { path: '/post/:id', component: DetailView },
   { path: '/pesan', component: PesanView },
   { path: '/pesan/:id', component: ChatView },
+  { path: '/lowongan', component: LowonganView },
   { path: '/profil', component: ProfileView },
 ]
 

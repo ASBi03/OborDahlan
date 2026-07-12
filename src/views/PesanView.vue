@@ -91,6 +91,7 @@
         </div>
       </div>
     </div>
+    <BottomNav />
   </div>
 </template>
 
@@ -99,6 +100,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
 import { useChat } from '@/composables/useChat'
+import BottomNav from '@/components/BottomNav.vue'
 
 const router = useRouter()
 const { currentUser: user } = useAuth()

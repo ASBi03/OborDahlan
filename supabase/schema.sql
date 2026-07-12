@@ -51,7 +51,20 @@ CREATE TABLE IF NOT EXISTS follows (
   UNIQUE(follower_id, following_id)
 );
 
--- 6. Conversations
+-- 6. Lowongan (job listings)
+CREATE TABLE IF NOT EXISTS lowongan (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  company TEXT NOT NULL,
+  position TEXT NOT NULL,
+  description TEXT NOT NULL,
+  salary TEXT DEFAULT '',
+  location TEXT DEFAULT '',
+  type TEXT DEFAULT 'Full-time',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 7. Conversations
 CREATE TABLE IF NOT EXISTS conversations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   created_at TIMESTAMPTZ DEFAULT NOW()
@@ -87,6 +100,8 @@ CREATE INDEX IF NOT EXISTS idx_post_likes_user_id ON post_likes(user_id);
 CREATE INDEX IF NOT EXISTS idx_comments_post_id ON comments(post_id);
 CREATE INDEX IF NOT EXISTS idx_follows_follower_id ON follows(follower_id);
 CREATE INDEX IF NOT EXISTS idx_follows_following_id ON follows(following_id);
+CREATE INDEX IF NOT EXISTS idx_lowongan_user_id ON lowongan(user_id);
+CREATE INDEX IF NOT EXISTS idx_lowongan_created_at ON lowongan(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_messages_conversation_id ON messages(conversation_id);
 CREATE INDEX IF NOT EXISTS idx_messages_created_at ON messages(created_at);
 CREATE INDEX IF NOT EXISTS idx_conversation_members_user_id ON conversation_members(user_id);
@@ -101,6 +116,7 @@ ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE post_likes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE comments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE follows ENABLE ROW LEVEL SECURITY;
+ALTER TABLE lowongan ENABLE ROW LEVEL SECURITY;
 ALTER TABLE conversations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE conversation_members ENABLE ROW LEVEL SECURITY;
 ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
@@ -129,6 +145,11 @@ CREATE POLICY "Users can delete own comments" ON comments FOR DELETE USING (auth
 CREATE POLICY "Follows are viewable by everyone" ON follows FOR SELECT USING (true);
 CREATE POLICY "Authenticated users can follow" ON follows FOR INSERT WITH CHECK (auth.uid() = follower_id);
 CREATE POLICY "Users can unfollow" ON follows FOR DELETE USING (auth.uid() = follower_id);
+
+-- Lowongan: anyone can read, authenticated users can create
+CREATE POLICY "Lowongan are viewable by everyone" ON lowongan FOR SELECT USING (true);
+CREATE POLICY "Authenticated users can create lowongan" ON lowongan FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can delete own lowongan" ON lowongan FOR DELETE USING (auth.uid() = user_id);
 
 -- Conversations: only members can view
 CREATE POLICY "Members can view conversations" ON conversations
