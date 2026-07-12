@@ -84,7 +84,15 @@
             {{ c.userInitials }}
           </div>
           <div class="comment-bubble">
-            <div class="comment-name">{{ c.userName }}</div>
+            <div class="comment-name">
+              {{ c.userName }}
+              <button
+                v-if="c.user_id === user?.id"
+                class="comment-delete"
+                @click="handleDeleteComment(c.id)"
+                title="Hapus komentar"
+              >✕</button>
+            </div>
             <div class="comment-text">{{ c.text }}</div>
             <div class="comment-time">{{ formatTime(c.created_at) }}</div>
           </div>
@@ -125,7 +133,7 @@ import { useChat } from '@/composables/useChat'
 const router = useRouter()
 const route = useRoute()
 const { currentUser: user } = useAuth()
-const { fetchPost, toggleLike, addComment } = usePosts()
+const { fetchPost, toggleLike, addComment, deleteComment } = usePosts()
 const { findOrCreateConversation } = useChat()
 
 const post = ref(null)
@@ -174,6 +182,11 @@ async function submitComment() {
 
 function goBack() {
   router.push('/home')
+}
+async function handleDeleteComment(commentId) {
+  await deleteComment(commentId)
+  post.value.comments = post.value.comments.filter((c) => c.id !== commentId)
+  post.value.commentCount--
 }
 async function startChat() {
   if (!user.value || !post.value || post.value.user_id === user.value.id) return

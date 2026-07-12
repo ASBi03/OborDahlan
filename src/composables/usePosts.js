@@ -5,29 +5,68 @@ export function usePosts() {
   const posts = ref([])
   const loading = ref(false)
 
-  async function fetchPosts() {
+  async function fetchPosts(userId) {
     loading.value = true
     const { data, error } = await supabase
       .from('posts')
-      .select(`
-        *,
-        profiles:user_id (name, initials, nim),
-        post_likes (id, user_id),
-        comments (id)
-      `)
+      .select('*')
       .order('created_at', { ascending: false })
 
     if (error) throw error
 
-    posts.value = data.map((post) => ({
-      ...post,
-      userName: post.profiles?.name,
-      userInitials: post.profiles?.initials,
-      userNim: post.profiles?.nim,
-      likeCount: post.post_likes?.length || 0,
-      commentCount: post.comments?.length || 0,
-      liked: false,
-    }))
+    if (!data || data.length === 0) {
+      posts.value = []
+      loading.value = false
+      return
+    }
+
+    const userIds = [...new Set(data.map((p) => p.user_id))]
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, name, initials, nim')
+      .in('id', userIds)
+
+    const profileMap = {}
+    for (const p of profiles || []) {
+      profileMap[p.id] = p
+    }
+
+    const postIds = data.map((p) => p.id)
+
+    const { data: allLikes } = await supabase
+      .from('post_likes')
+      .select('post_id, user_id')
+      .in('post_id', postIds)
+
+    const likeMap = {}
+    for (const l of allLikes || []) {
+      if (!likeMap[l.post_id]) likeMap[l.post_id] = []
+      likeMap[l.post_id].push(l.user_id)
+    }
+
+    const { data: allComments } = await supabase
+      .from('comments')
+      .select('post_id')
+      .in('post_id', postIds)
+
+    const commentCountMap = {}
+    for (const c of allComments || []) {
+      commentCountMap[c.post_id] = (commentCountMap[c.post_id] || 0) + 1
+    }
+
+    posts.value = data.map((post) => {
+      const profile = profileMap[post.user_id] || {}
+      const likes = likeMap[post.id] || []
+      return {
+        ...post,
+        userName: profile.name || '',
+        userInitials: profile.initials || '',
+        userNim: profile.nim || '',
+        likeCount: likes.length,
+        commentCount: commentCountMap[post.id] || 0,
+        liked: userId ? likes.includes(userId) : false,
+      }
+    })
 
     loading.value = false
   }
@@ -35,35 +74,60 @@ export function usePosts() {
   async function fetchPost(id, userId) {
     const { data, error } = await supabase
       .from('posts')
-      .select(`
-        *,
-        profiles:user_id (name, initials, nim),
-        post_likes (id, user_id),
-        comments (
-          id,
-          text,
-          created_at,
-          profiles:user_id (name, initials)
-        )
-      `)
+      .select('*')
       .eq('id', id)
-      .single()
+      .maybeSingle()
 
     if (error) throw error
+    if (!data) return null
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('name, initials, nim')
+      .eq('id', data.user_id)
+      .maybeSingle()
+
+    const { data: likes } = await supabase
+      .from('post_likes')
+      .select('user_id')
+      .eq('post_id', id)
+
+    const { data: commentsData } = await supabase
+      .from('comments')
+      .select('*')
+      .eq('post_id', id)
+      .order('created_at', { ascending: true })
+
+    const commentUserIds = [...new Set((commentsData || []).map((c) => c.user_id))]
+    let commentProfiles = []
+    if (commentUserIds.length > 0) {
+      const { data } = await supabase
+        .from('profiles')
+        .select('id, name, initials')
+        .in('id', commentUserIds)
+      commentProfiles = data || []
+    }
+
+    const commentProfileMap = {}
+    for (const p of commentProfiles) {
+      commentProfileMap[p.id] = p
+    }
+
+    const likeUserIds = (likes || []).map((l) => l.user_id)
 
     return {
       ...data,
-      userName: data.profiles?.name,
-      userInitials: data.profiles?.initials,
-      userNim: data.profiles?.nim,
-      likeCount: data.post_likes?.length || 0,
-      commentCount: data.comments?.length || 0,
-      liked: data.post_likes?.some((l) => l.user_id === userId) || false,
-      comments: data.comments?.map((c) => ({
+      userName: profile?.name || '',
+      userInitials: profile?.initials || '',
+      userNim: profile?.nim || '',
+      likeCount: likes?.length || 0,
+      commentCount: commentsData?.length || 0,
+      liked: userId ? likeUserIds.includes(userId) : false,
+      comments: (commentsData || []).map((c) => ({
         ...c,
-        userName: c.profiles?.name,
-        userInitials: c.profiles?.initials,
-      })) || [],
+        userName: commentProfileMap[c.user_id]?.name || '',
+        userInitials: commentProfileMap[c.user_id]?.initials || '',
+      })),
     }
   }
 
@@ -71,19 +135,22 @@ export function usePosts() {
     const { data, error } = await supabase
       .from('posts')
       .insert({ user_id: userId, content })
-      .select(`
-        *,
-        profiles:user_id (name, initials, nim)
-      `)
+      .select('*')
       .single()
 
     if (error) throw error
 
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('name, initials, nim')
+      .eq('id', userId)
+      .maybeSingle()
+
     return {
       ...data,
-      userName: data.profiles?.name,
-      userInitials: data.profiles?.initials,
-      userNim: data.profiles?.nim,
+      userName: profile?.name || '',
+      userInitials: profile?.initials || '',
+      userNim: profile?.nim || '',
       likeCount: 0,
       commentCount: 0,
       liked: false,
@@ -101,7 +168,7 @@ export function usePosts() {
       .select('id')
       .eq('post_id', postId)
       .eq('user_id', userId)
-      .single()
+      .maybeSingle()
 
     if (existing) {
       await supabase.from('post_likes').delete().eq('id', existing.id)
@@ -116,19 +183,27 @@ export function usePosts() {
     const { data, error } = await supabase
       .from('comments')
       .insert({ post_id: postId, user_id: userId, text })
-      .select(`
-        *,
-        profiles:user_id (name, initials)
-      `)
+      .select('*')
       .single()
 
     if (error) throw error
 
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('name, initials')
+      .eq('id', userId)
+      .maybeSingle()
+
     return {
       ...data,
-      userName: data.profiles?.name,
-      userInitials: data.profiles?.initials,
+      userName: profile?.name || '',
+      userInitials: profile?.initials || '',
     }
+  }
+
+  async function deleteComment(commentId) {
+    const { error } = await supabase.from('comments').delete().eq('id', commentId)
+    if (error) throw error
   }
 
   return {
@@ -140,5 +215,6 @@ export function usePosts() {
     deletePost,
     toggleLike,
     addComment,
+    deleteComment,
   }
 }

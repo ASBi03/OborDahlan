@@ -40,7 +40,7 @@
           </div>
 
           <div class="form-group">
-            <label>Email UAD</label>
+            <label>Email</label>
             <div class="input-wrap">
               <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
@@ -54,14 +54,7 @@
                 required
               />
             </div>
-            <span class="form-hint">NIM akan otomatis diambil dari email</span>
-          </div>
-
-          <div v-if="extractedNim" class="nim-preview">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-            </svg>
-            NIM kamu: <strong>{{ extractedNim }}</strong>
+            <span class="form-hint">@webmail.uad.ac.id = Mahasiswa · Email lain = Perusahaan</span>
           </div>
 
           <div class="form-group">
@@ -117,7 +110,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
 
@@ -132,13 +125,6 @@ const error = ref('')
 const success = ref('')
 const isLoading = ref(false)
 
-const extractedNim = computed(() => {
-  if (!email.value) return ''
-  const localPart = email.value.split('@')[0]
-  if (/^\d{10}$/.test(localPart)) return localPart
-  return ''
-})
-
 async function handleRegister() {
   error.value = ''
   success.value = ''
@@ -148,9 +134,6 @@ async function handleRegister() {
     if (!name.value || !email.value || !password.value) {
       throw new Error('Semua field wajib diisi')
     }
-    if (!extractedNim.value) {
-      throw new Error('Email harus format NIM@webmail.uad.ac.id (NIM 10 digit)')
-    }
     if (password.value !== confirmPassword.value) {
       throw new Error('Password tidak cocok')
     }
@@ -158,7 +141,7 @@ async function handleRegister() {
       throw new Error('Password minimal 6 karakter')
     }
 
-    await register(name.value, extractedNim.value, email.value, password.value)
+    await register(name.value, email.value, password.value)
 
     success.value = 'Registrasi berhasil! Silakan masuk.'
     setTimeout(() => {

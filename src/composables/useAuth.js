@@ -4,6 +4,11 @@ import { supabase } from '@/utils/supabase'
 const currentUser = ref(null)
 const loading = ref(true)
 
+function getRoleFromEmail(email) {
+  if (!email) return 'mahasiswa'
+  return email.endsWith('@webmail.uad.ac.id') ? 'mahasiswa' : 'perusahaan'
+}
+
 export function useAuth() {
   async function init() {
     const { data: { session } } = await supabase.auth.getSession()
@@ -26,29 +31,34 @@ export function useAuth() {
       .from('profiles')
       .select('*')
       .eq('id', user.id)
-      .single()
+      .maybeSingle()
 
     if (data) {
       currentUser.value = data
     } else {
-      currentUser.value = {
-        id: user.id,
-        name: user.user_metadata?.name || 'User',
-        nim: user.user_metadata?.nim || '',
-        email: user.email || '',
-        initials: user.user_metadata?.name
-          ?.split(' ')
-          .map((w) => w[0])
-          .join('')
-          .toUpperCase()
-          .slice(0, 2) || 'U',
-        jurusan: 'Sistem Informasi',
-        angkatan: '2023',
+      const name = user.user_metadata?.name || 'User'
+      const email = user.email || ''
+      const role = getRoleFromEmail(email)
+      const initials = user.user_metadata?.initials || name.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2)
+
+      const { error: insertError } = await supabase
+        .from('profiles')
+        .insert({
+          id: user.id,
+          name,
+          nim: '',
+          email,
+          initials,
+          role,
+        })
+
+      if (!insertError) {
+        currentUser.value = { id: user.id, name, nim: '', email, initials, jurusan: '', angkatan: '', role }
       }
     }
   }
 
-  async function register(name, nim, email, password) {
+  async function register(name, email, password) {
     const initials = name
       .split(' ')
       .map((w) => w[0])
@@ -56,15 +66,41 @@ export function useAuth() {
       .toUpperCase()
       .slice(0, 2)
 
+    const role = getRoleFromEmail(email)
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { name, nim, initials },
+        data: { name, initials, role },
       },
     })
 
     if (error) throw error
+
+    if (data.user) {
+      await new Promise((r) => setTimeout(r, 500))
+
+      const { data: existing } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', data.user.id)
+        .maybeSingle()
+
+      if (!existing) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: data.user.id,
+            name,
+            nim: '',
+            email,
+            initials,
+            role,
+          })
+        if (profileError) throw profileError
+      }
+    }
 
     return data
   }
@@ -137,6 +173,32 @@ export function useAuth() {
     }
   }
 
+  async function updateProfile(updates) {
+    if (!currentUser.value) throw new Error('Login dulu')
+
+    const initials = updates.name
+      ? updates.name.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2)
+      : currentUser.value.initials
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .update({
+        name: updates.name || currentUser.value.name,
+        nim: updates.nim ?? currentUser.value.nim,
+        jurusan: updates.jurusan ?? currentUser.value.jurusan,
+        angkatan: updates.angkatan ?? currentUser.value.angkatan,
+        initials,
+      })
+      .eq('id', currentUser.value.id)
+      .select('*')
+      .single()
+
+    if (error) throw error
+
+    currentUser.value = data
+    return data
+  }
+
   return {
     currentUser,
     loading,
@@ -144,8 +206,10 @@ export function useAuth() {
     register,
     login,
     logout,
+    updateProfile,
     fetchFollowCounts,
     isFollowing,
     toggleFollow,
+    getRoleFromEmail,
   }
 }

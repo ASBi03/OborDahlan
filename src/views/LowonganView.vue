@@ -4,14 +4,6 @@
       <div class="nav-left">
         <div class="nav-brand">Lowongan</div>
       </div>
-      <div class="nav-right">
-        <button class="nav-icon-btn" @click="showModal = true" title="Pasang Lowongan">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="12" y1="5" x2="12" y2="19" />
-            <line x1="5" y1="12" x2="19" y2="12" />
-          </svg>
-        </button>
-      </div>
     </nav>
 
     <div class="home-wrap">
@@ -95,77 +87,16 @@
         </div>
       </div>
     </div>
-
-    <!-- MODAL PASANG LOWONGAN -->
-    <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
-      <div class="modal-box">
-        <div class="modal-header">
-          <h3>Pasang Lowongan</h3>
-          <button class="modal-close" @click="showModal = false">✕</button>
-        </div>
-        <form @submit.prevent="submitLowongan" class="auth-form">
-          <div class="form-group">
-            <label>Nama Perusahaan</label>
-            <input v-model="form.company" class="form-input" placeholder="PT Maju Jaya" required />
-          </div>
-          <div class="form-group">
-            <label>Posisi</label>
-            <input v-model="form.position" class="form-input" placeholder="Frontend Developer" required />
-          </div>
-          <div class="form-group">
-            <label>Deskripsi</label>
-            <textarea v-model="form.description" class="modal-textarea" rows="3" placeholder="Deskripsi pekerjaan..." required></textarea>
-          </div>
-          <div style="display: flex; gap: 0.8rem">
-            <div class="form-group" style="flex: 1">
-              <label>Gaji</label>
-              <input v-model="form.salary" class="form-input" placeholder="Rp 5-8 juta" />
-            </div>
-            <div class="form-group" style="flex: 1">
-              <label>Lokasi</label>
-              <input v-model="form.location" class="form-input" placeholder="Yogyakarta" />
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Tipe</label>
-            <select v-model="form.type" class="form-input">
-              <option value="Full-time">Full-time</option>
-              <option value="Part-time">Part-time</option>
-              <option value="Freelance">Freelance</option>
-              <option value="Internship">Internship</option>
-            </select>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn-cancel" @click="showModal = false">Batal</button>
-            <button type="submit" class="btn-post">Pasang</button>
-          </div>
-        </form>
-      </div>
-    </div>
     <BottomNav />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuth } from '@/composables/useAuth'
+import { onMounted } from 'vue'
 import { useLowongan } from '@/composables/useLowongan'
 import BottomNav from '@/components/BottomNav.vue'
 
-const router = useRouter()
-const { currentUser: user } = useAuth()
-const { lowongan, loading, fetchLowongan, createLowongan } = useLowongan()
-
-const showModal = ref(false)
-const form = ref({
-  company: '',
-  position: '',
-  description: '',
-  salary: '',
-  location: '',
-  type: 'Full-time',
-})
+const { lowongan, loading, fetchLowongan } = useLowongan()
 
 function formatTime(dateStr) {
   if (!dateStr) return ''
@@ -185,12 +116,4 @@ function formatTime(dateStr) {
 onMounted(() => {
   fetchLowongan()
 })
-
-async function submitLowongan() {
-  if (!user.value) return
-  const result = await createLowongan(user.value.id, form.value)
-  lowongan.value.unshift(result)
-  form.value = { company: '', position: '', description: '', salary: '', location: '', type: 'Full-time' }
-  showModal.value = false
-}
 </script>

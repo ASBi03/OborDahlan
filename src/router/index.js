@@ -7,6 +7,7 @@ import PesanView from '@/views/PesanView.vue'
 import ChatView from '@/views/ChatView.vue'
 import LowonganView from '@/views/LowonganView.vue'
 import ProfileView from '@/views/ProfileView.vue'
+import CompanyDashboardView from '@/views/CompanyDashboardView.vue'
 
 const routes = [
   { path: '/', redirect: '/login' },
@@ -18,6 +19,7 @@ const routes = [
   { path: '/pesan/:id', component: ChatView },
   { path: '/lowongan', component: LowonganView },
   { path: '/profil', component: ProfileView },
+  { path: '/dashboard-perusahaan', component: CompanyDashboardView },
 ]
 
 const router = createRouter({

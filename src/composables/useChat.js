@@ -148,29 +148,35 @@ export function useChat() {
   }
 
   async function findOrCreateConversation(userId, recipientId) {
-    const { data: userMemberships } = await supabase
-      .from('conversation_members')
-      .select('conversation_id')
-      .eq('user_id', userId)
-
-    if (userMemberships && userMemberships.length > 0) {
-      const convIds = userMemberships.map((e) => e.conversation_id)
-
-      const { data: mutual } = await supabase
+    try {
+      const { data: userMemberships } = await supabase
         .from('conversation_members')
         .select('conversation_id')
-        .in('conversation_id', convIds)
-        .eq('user_id', recipientId)
-        .limit(1)
+        .eq('user_id', userId)
 
-      if (mutual && mutual.length > 0) return mutual[0].conversation_id
+      if (userMemberships && userMemberships.length > 0) {
+        const convIds = userMemberships.map((e) => e.conversation_id)
+
+        const { data: mutual } = await supabase
+          .from('conversation_members')
+          .select('conversation_id')
+          .in('conversation_id', convIds)
+          .eq('user_id', recipientId)
+          .limit(1)
+
+        if (mutual && mutual.length > 0) return mutual[0].conversation_id
+      }
+    } catch (err) {
+      console.warn('Error checking existing conversation:', err)
     }
 
-    const { data: newConv } = await supabase
+    const { data: newConv, error: convError } = await supabase
       .from('conversations')
       .insert({})
       .select('id')
       .single()
+
+    if (convError) throw convError
 
     await supabase.from('conversation_members').insert([
       { conversation_id: newConv.id, user_id: userId },

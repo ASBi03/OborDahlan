@@ -252,7 +252,7 @@ function formatTime(dateStr) {
 }
 
 onMounted(async () => {
-  await fetchPosts()
+  await fetchPosts(user.value?.id)
 
   if (user.value?.id) {
     followCounts.value = await fetchFollowCounts(user.value.id)

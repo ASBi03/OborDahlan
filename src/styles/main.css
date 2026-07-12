@@ -391,6 +391,42 @@ body {
 .auth-switch a:hover {
   text-decoration: underline;
 }
+
+/* role toggle */
+.role-toggle {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+}
+.role-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.7rem;
+  border: 2px solid var(--gray-border);
+  border-radius: var(--radius-md);
+  background: white;
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--gray-muted);
+  transition: all 0.2s;
+}
+.role-btn:hover {
+  border-color: var(--green-mid);
+  color: var(--green-dark);
+}
+.role-btn.active {
+  border-color: var(--green-dark);
+  background: #edf7f0;
+  color: var(--green-dark);
+}
+.role-btn.active svg {
+  stroke: var(--green-dark);
+}
 .form-hint {
   display: block;
   font-size: 0.72rem;
@@ -900,6 +936,23 @@ body {
   font-weight: 700;
   font-size: 0.8rem;
   margin-bottom: 0.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.comment-delete {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--gray-muted);
+  font-size: 0.7rem;
+  padding: 0 0.2rem;
+  border-radius: 4px;
+  transition: color 0.15s;
+  line-height: 1;
+}
+.comment-delete:hover {
+  color: var(--red);
 }
 .comment-text {
   font-size: 0.82rem;
@@ -1203,6 +1256,24 @@ body {
   margin-top: 1rem;
   padding-top: 1rem;
   border-top: 1px solid var(--gray-border);
+}
+.btn-edit-profile {
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.55rem;
+  border: 1.5px solid var(--green-dark);
+  border-radius: 50px;
+  background: white;
+  color: var(--green-dark);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-edit-profile:hover {
+  background: var(--green-dark);
+  color: white;
 }
 .stat-item {
   text-align: center;

@@ -7,11 +7,12 @@
 CREATE TABLE IF NOT EXISTS profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
-  nim TEXT UNIQUE NOT NULL,
+  nim TEXT DEFAULT '',
   email TEXT UNIQUE NOT NULL,
   initials TEXT NOT NULL,
-  jurusan TEXT DEFAULT 'Sistem Informasi',
-  angkatan TEXT DEFAULT '2023',
+  jurusan TEXT DEFAULT '',
+  angkatan TEXT DEFAULT '',
+  role TEXT DEFAULT 'mahasiswa',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -151,41 +152,42 @@ CREATE POLICY "Lowongan are viewable by everyone" ON lowongan FOR SELECT USING (
 CREATE POLICY "Authenticated users can create lowongan" ON lowongan FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Users can delete own lowongan" ON lowongan FOR DELETE USING (auth.uid() = user_id);
 
--- Conversations: only members can view
+-- Conversations: members can view, anyone authenticated can create
+DROP POLICY IF EXISTS "Authenticated users can create conversations" ON conversations;
+DROP POLICY IF EXISTS "Members can view conversations" ON conversations;
+DROP POLICY IF EXISTS "Authenticated users can add members" ON conversation_members;
+DROP POLICY IF EXISTS "Members can view own membership" ON conversation_members;
+DROP POLICY IF EXISTS "Members can view messages" ON messages;
+DROP POLICY IF EXISTS "Members can send messages" ON messages;
+
+CREATE POLICY "Authenticated users can create conversations" ON conversations FOR INSERT WITH CHECK (true);
 CREATE POLICY "Members can view conversations" ON conversations
   FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM conversation_members
-      WHERE conversation_id = id AND user_id = auth.uid()
+    auth.uid() IN (
+      SELECT user_id FROM conversation_members
+      WHERE conversation_id = id
     )
   );
-CREATE POLICY "Authenticated users can create conversations" ON conversations FOR INSERT WITH CHECK (true);
 
--- Conversation members: only members can view
-CREATE POLICY "Members can view members" ON conversation_members
-  FOR SELECT USING (
-    user_id = auth.uid() OR
-    EXISTS (
-      SELECT 1 FROM conversation_members cm
-      WHERE cm.conversation_id = conversation_members.conversation_id AND cm.user_id = auth.uid()
-    )
-  );
+-- Conversation members: members can view, authenticated users can insert
 CREATE POLICY "Authenticated users can add members" ON conversation_members FOR INSERT WITH CHECK (true);
+CREATE POLICY "Members can view own membership" ON conversation_members
+  FOR SELECT USING (user_id = auth.uid());
 
--- Messages: only conversation members can view/send
+-- Messages: conversation members can view/send
 CREATE POLICY "Members can view messages" ON messages
   FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM conversation_members
-      WHERE conversation_id = messages.conversation_id AND user_id = auth.uid()
+    auth.uid() IN (
+      SELECT user_id FROM conversation_members
+      WHERE conversation_id = messages.conversation_id
     )
   );
 CREATE POLICY "Members can send messages" ON messages
   FOR INSERT WITH CHECK (
     auth.uid() = sender_id AND
-    EXISTS (
-      SELECT 1 FROM conversation_members
-      WHERE conversation_id = messages.conversation_id AND user_id = auth.uid()
+    auth.uid() IN (
+      SELECT user_id FROM conversation_members
+      WHERE conversation_id = messages.conversation_id
     )
   );
 
@@ -199,18 +201,20 @@ DECLARE
   user_nim TEXT;
   user_email TEXT;
   user_initials TEXT;
+  user_role TEXT;
 BEGIN
   user_name := COALESCE(NEW.raw_user_meta_data->>'name', 'User');
-  user_email := COALESCE(NEW.email, '');
   user_nim := COALESCE(NEW.raw_user_meta_data->>'nim', '');
+  user_email := COALESCE(NEW.email, '');
+  user_role := COALESCE(NEW.raw_user_meta_data->>'role', 'mahasiswa');
   user_initials := UPPER(LEFT(user_name, 1));
   IF LENGTH(user_name) > 0 THEN
     user_initials := REGEXP_REPLACE(user_name, '(\S+)\s+(\S+).*', '\1\2');
     user_initials := UPPER(LEFT(user_initials, 2));
   END IF;
 
-  INSERT INTO profiles (id, name, nim, email, initials)
-  VALUES (NEW.id, user_name, user_nim, user_email, user_initials);
+  INSERT INTO profiles (id, name, nim, email, initials, role)
+  VALUES (NEW.id, user_name, user_nim, user_email, user_initials, user_role);
 
   RETURN NEW;
 END;
