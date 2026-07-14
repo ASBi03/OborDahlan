@@ -72,7 +72,9 @@
           @click="goDetail(post.id)"
         >
           <div class="post-header">
-            <div class="avatar">{{ post.userInitials }}</div>
+            <div class="avatar" :style="post.userAvatarUrl ? { backgroundImage: `url(${post.userAvatarUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}">
+              <span v-if="!post.userAvatarUrl">{{ post.userInitials }}</span>
+            </div>
             <div class="post-meta">
               <div class="post-username">{{ post.userName }}</div>
               <div class="post-time">{{ formatTime(post.created_at) }}</div>
@@ -80,6 +82,7 @@
           </div>
           <div class="post-divider"></div>
           <p class="post-content">{{ post.content }}</p>
+          <div v-if="post.image" class="post-image"><img :src="post.image" alt="Foto postingan" /></div>
           <div class="post-actions">
             <button class="action-btn" :class="{ liked: post.liked }" @click.stop="handleLike(post)">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -217,13 +220,16 @@ onMounted(async () => {
   loadAvatar()
 })
 
+watch(user, () => {
+  loadAvatar()
+})
+
 function loadAvatar() {
   if (!user.value) return
-  const { data } = supabase.storage
-    .from('avatars')
-    .getPublicUrl(`${user.value.id}/avatar.jpg`)
-  if (data?.publicUrl) {
-    avatarUrl.value = data.publicUrl + '?t=' + Date.now()
+  if (user.value.avatar_url) {
+    avatarUrl.value = user.value.avatar_url + '?t=' + Date.now()
+  } else {
+    avatarUrl.value = null
   }
 }
 
@@ -234,6 +240,7 @@ async function handleAvatarUpload(e) {
   try {
     const url = await uploadAvatar(user.value.id, file)
     avatarUrl.value = url + '?t=' + Date.now()
+    user.value.avatar_url = url
   } catch (err) {
     console.error('Gagal upload avatar:', err)
   } finally {

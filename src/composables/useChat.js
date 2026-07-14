@@ -31,7 +31,7 @@ export function useChat() {
 
     const { data: profiles } = await supabase
       .from('profiles')
-      .select('id, name, initials')
+      .select('id, name, initials, avatar_url')
 
     const profileMap = {}
     for (const p of profiles || []) {
@@ -83,7 +83,7 @@ export function useChat() {
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('id, name, initials')
+      .select('id, name, initials, avatar_url')
       .eq('id', data[0].user_id)
       .single()
 
@@ -107,7 +107,7 @@ export function useChat() {
     const senderIds = [...new Set(data.map((m) => m.sender_id))]
     const { data: profiles } = await supabase
       .from('profiles')
-      .select('id, name, initials')
+      .select('id, name, initials, avatar_url')
       .in('id', senderIds)
 
     const profileMap = {}
@@ -148,7 +148,7 @@ export function useChat() {
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('name, initials')
+      .select('name, initials, avatar_url')
       .eq('id', senderId)
       .single()
 
@@ -156,6 +156,7 @@ export function useChat() {
       ...data,
       senderName: profile?.name || '',
       senderInitials: profile?.initials || '',
+      senderAvatarUrl: profile?.avatar_url || '',
     }
   }
 
@@ -175,7 +176,7 @@ export function useChat() {
 
     const { data } = await supabase
       .from('profiles')
-      .select('id, name, nim, initials')
+      .select('id, name, nim, initials, avatar_url')
       .neq('id', currentUserId)
       .or(`name.ilike.%${query}%,nim.ilike.%${query}%`)
       .limit(10)
@@ -197,7 +198,7 @@ export function useChat() {
         async (payload) => {
           const { data: profile } = await supabase
             .from('profiles')
-            .select('name, initials')
+            .select('name, initials, avatar_url')
             .eq('id', payload.new.sender_id)
             .single()
 
@@ -207,6 +208,7 @@ export function useChat() {
               ...payload.new,
               senderName: profile?.name || '',
               senderInitials: profile?.initials || '',
+              senderAvatarUrl: profile?.avatar_url || '',
             },
           })
         }

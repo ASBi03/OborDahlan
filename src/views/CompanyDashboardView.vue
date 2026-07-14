@@ -19,7 +19,9 @@
     <div class="home-wrap">
       <div class="sidebar sidebar-left">
         <div class="sidebar-card">
-          <div class="mini-avatar" style="background: var(--orange)">{{ user?.initials }}</div>
+          <div class="mini-avatar" style="background: var(--orange)" :style="user?.avatar_url ? { backgroundImage: `url(${user.avatar_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}">
+            <span v-if="!user?.avatar_url">{{ user?.initials }}</span>
+          </div>
           <div class="mini-name">{{ user?.name }}</div>
           <div class="mini-nim" style="color: var(--orange); font-weight: 600">Akun Perusahaan</div>
           <div class="mini-stats">
@@ -41,7 +43,9 @@
 
       <div class="home-feed">
         <div class="create-post" @click="showModal = true">
-          <div class="avatar" style="background: var(--orange)">{{ user?.initials }}</div>
+          <div class="avatar" style="background: var(--orange)" :style="user?.avatar_url ? { backgroundImage: `url(${user.avatar_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}">
+            <span v-if="!user?.avatar_url">{{ user?.initials }}</span>
+          </div>
           <input class="create-post-input" placeholder="Pasang lowongan baru..." readonly />
           <button class="create-post-cam">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -66,7 +70,9 @@
           class="lowongan-card"
         >
           <div class="lowongan-header">
-            <div class="avatar" style="background: var(--orange)">{{ user?.initials }}</div>
+          <div class="avatar" style="background: var(--orange)" :style="user?.avatar_url ? { backgroundImage: `url(${user.avatar_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}">
+            <span v-if="!user?.avatar_url">{{ user?.initials }}</span>
+          </div>
             <div class="post-meta">
               <div class="post-username">{{ item.company }}</div>
               <div class="post-time">{{ formatTime(item.created_at) }}</div>

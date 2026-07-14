@@ -18,7 +18,9 @@
     <div class="page-content main-layout" v-else-if="post">
       <div class="post-card">
           <div class="post-header">
-            <div class="avatar clickable" @click.stop="goUser(post.user_id)">{{ post.userInitials }}</div>
+            <div class="avatar clickable" @click.stop="goUser(post.user_id)" :style="post.userAvatarUrl ? { backgroundImage: `url(${post.userAvatarUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}">
+              <span v-if="!post.userAvatarUrl">{{ post.userInitials }}</span>
+            </div>
             <div class="post-meta">
               <div class="post-username clickable" @click.stop="goUser(post.user_id)">{{ post.userName }}</div>
               <div class="post-time">{{ formatTime(post.created_at) }} · {{ post.userNim }}</div>
@@ -90,8 +92,8 @@
           Belum ada komentar. Jadilah yang pertama! 💬
         </div>
         <div v-for="c in post.comments" :key="c.id" class="comment-item">
-          <div class="avatar" style="width: 32px; height: 32px; font-size: 0.75rem; flex-shrink: 0">
-            {{ c.userInitials }}
+          <div class="avatar" style="width: 32px; height: 32px; font-size: 0.75rem; flex-shrink: 0" :style="c.userAvatarUrl ? { backgroundImage: `url(${c.userAvatarUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}">
+            <span v-if="!c.userAvatarUrl">{{ c.userInitials }}</span>
           </div>
           <div class="comment-bubble">
             <div class="comment-name">
@@ -108,8 +110,8 @@
           </div>
         </div>
         <div class="comment-input-wrap">
-          <div class="avatar" style="width: 32px; height: 32px; font-size: 0.75rem; flex-shrink: 0">
-            {{ user?.initials }}
+          <div class="avatar" style="width: 32px; height: 32px; font-size: 0.75rem; flex-shrink: 0" :style="user?.avatar_url ? { backgroundImage: `url(${user.avatar_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}">
+            <span v-if="!user?.avatar_url">{{ user?.initials }}</span>
           </div>
           <input
             class="comment-input"

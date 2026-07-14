@@ -17,7 +17,9 @@
           Memuat profil...
         </div>
         <template v-else-if="profileUser">
-          <div class="profile-avatar-lg">{{ profileUser.initials }}</div>
+          <div class="profile-avatar-lg" :style="profileUser.avatar_url ? { backgroundImage: `url(${profileUser.avatar_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}">
+            <span v-if="!profileUser.avatar_url">{{ profileUser.initials }}</span>
+          </div>
           <div class="profile-name">{{ profileUser.name }}</div>
           <div class="profile-nim">
             <span v-if="profileUser.nim">NIM: {{ profileUser.nim }}</span>
@@ -77,7 +79,9 @@
           @click="goDetail(post.id)"
         >
           <div class="post-header">
-            <div class="avatar">{{ post.userInitials }}</div>
+            <div class="avatar" :style="post.userAvatarUrl ? { backgroundImage: `url(${post.userAvatarUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}">
+              <span v-if="!post.userAvatarUrl">{{ post.userInitials }}</span>
+            </div>
             <div class="post-meta">
               <div class="post-username">{{ post.userName }}</div>
               <div class="post-time">{{ formatTime(post.created_at) }}</div>

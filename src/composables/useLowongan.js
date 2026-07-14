@@ -23,7 +23,7 @@ export function useLowongan() {
     const userIds = [...new Set(data.map((l) => l.user_id))]
     const { data: profiles } = await supabase
       .from('profiles')
-      .select('id, name, initials')
+      .select('id, name, initials, avatar_url')
       .in('id', userIds)
 
     const profileMap = {}
@@ -35,6 +35,7 @@ export function useLowongan() {
       ...l,
       posterName: profileMap[l.user_id]?.name || '',
       posterInitials: profileMap[l.user_id]?.initials || '',
+      posterAvatarUrl: profileMap[l.user_id]?.avatar_url || '',
     }))
 
     loading.value = false
@@ -59,7 +60,7 @@ export function useLowongan() {
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('name, initials')
+      .select('name, initials, avatar_url')
       .eq('id', userId)
       .single()
 
@@ -67,6 +68,7 @@ export function useLowongan() {
       ...result,
       posterName: profile?.name || '',
       posterInitials: profile?.initials || '',
+      posterAvatarUrl: profile?.avatar_url || '',
     }
   }
 

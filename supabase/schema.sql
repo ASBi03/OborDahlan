@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS profiles (
   jurusan TEXT DEFAULT '',
   angkatan TEXT DEFAULT '',
   role TEXT DEFAULT 'mahasiswa',
+  avatar_url TEXT DEFAULT '',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

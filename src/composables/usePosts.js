@@ -23,7 +23,7 @@ export function usePosts() {
     const userIds = [...new Set(data.map((p) => p.user_id))]
     const { data: profiles } = await supabase
       .from('profiles')
-      .select('id, name, initials, nim')
+      .select('id, name, initials, nim, avatar_url')
       .in('id', userIds)
 
     const profileMap = {}
@@ -62,6 +62,7 @@ export function usePosts() {
         userName: profile.name || '',
         userInitials: profile.initials || '',
         userNim: profile.nim || '',
+        userAvatarUrl: profile.avatar_url || '',
         likeCount: likes.length,
         commentCount: commentCountMap[post.id] || 0,
         liked: userId ? likes.includes(userId) : false,
@@ -83,7 +84,7 @@ export function usePosts() {
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('name, initials, nim')
+      .select('name, initials, nim, avatar_url')
       .eq('id', data.user_id)
       .maybeSingle()
 
@@ -103,7 +104,7 @@ export function usePosts() {
     if (commentUserIds.length > 0) {
       const { data } = await supabase
         .from('profiles')
-        .select('id, name, initials')
+        .select('id, name, initials, avatar_url')
         .in('id', commentUserIds)
       commentProfiles = data || []
     }
@@ -120,6 +121,7 @@ export function usePosts() {
       userName: profile?.name || '',
       userInitials: profile?.initials || '',
       userNim: profile?.nim || '',
+      userAvatarUrl: profile?.avatar_url || '',
       likeCount: likes?.length || 0,
       commentCount: commentsData?.length || 0,
       liked: userId ? likeUserIds.includes(userId) : false,
@@ -127,6 +129,7 @@ export function usePosts() {
         ...c,
         userName: commentProfileMap[c.user_id]?.name || '',
         userInitials: commentProfileMap[c.user_id]?.initials || '',
+        userAvatarUrl: commentProfileMap[c.user_id]?.avatar_url || '',
       })),
     }
   }
@@ -151,6 +154,7 @@ export function usePosts() {
       userName: profile?.name || '',
       userInitials: profile?.initials || '',
       userNim: profile?.nim || '',
+      userAvatarUrl: profile?.avatar_url || '',
       likeCount: 0,
       commentCount: 0,
       liked: false,
@@ -190,7 +194,7 @@ export function usePosts() {
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('name, initials')
+      .select('name, initials, avatar_url')
       .eq('id', userId)
       .maybeSingle()
 
@@ -198,6 +202,7 @@ export function usePosts() {
       ...data,
       userName: profile?.name || '',
       userInitials: profile?.initials || '',
+      userAvatarUrl: profile?.avatar_url || '',
     }
   }
 

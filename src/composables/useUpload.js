@@ -45,7 +45,14 @@ export function useUpload() {
       .from(BUCKET_AVATARS)
       .getPublicUrl(path)
 
-    return data.publicUrl
+    const publicUrl = data.publicUrl
+
+    await supabase
+      .from('profiles')
+      .update({ avatar_url: publicUrl })
+      .eq('id', userId)
+
+    return publicUrl
   }
 
   async function uploadPostImage(userId, file) {

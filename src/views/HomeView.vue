@@ -17,8 +17,8 @@
           </svg>
         </button>
         <NotificationBell />
-        <button class="nav-icon-btn" @click="goProfile">
-          <span style="font-size: 0.75rem; font-weight: 700">{{ user?.initials }}</span>
+        <button class="nav-icon-btn" @click="goProfile" :style="user?.avatar_url ? { backgroundImage: `url(${user.avatar_url})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: '50%', width: '32px', height: '32px' } : {}">
+          <span v-if="!user?.avatar_url" style="font-size: 0.75rem; font-weight: 700">{{ user?.initials }}</span>
         </button>
       </div>
     </nav>
@@ -27,7 +27,9 @@
       <!-- KOLOM KIRI -->
       <div class="sidebar sidebar-left">
         <div class="sidebar-card">
-          <div class="mini-avatar">{{ user?.initials }}</div>
+          <div class="mini-avatar" :style="user?.avatar_url ? { backgroundImage: `url(${user.avatar_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}">
+            <span v-if="!user?.avatar_url">{{ user?.initials }}</span>
+          </div>
           <div class="mini-name">{{ user?.name }}</div>
           <div class="mini-nim">{{ user?.nim }}</div>
           <div class="mini-stats">
@@ -58,7 +60,9 @@
       <!-- KOLOM TENGAH - FEED -->
       <div class="home-feed">
         <div class="create-post" @click="showModal = true">
-          <div class="avatar">{{ user?.initials }}</div>
+          <div class="avatar" :style="user?.avatar_url ? { backgroundImage: `url(${user.avatar_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}">
+            <span v-if="!user?.avatar_url">{{ user?.initials }}</span>
+          </div>
           <input class="create-post-input" placeholder="Bagikan sesuatu ke komunitas..." readonly />
           <button class="create-post-cam">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -79,7 +83,9 @@
           @click="goDetail(post.id)"
         >
           <div class="post-header">
-            <div class="avatar clickable" @click.stop="goUser(post.user_id)">{{ post.userInitials }}</div>
+            <div class="avatar clickable" @click.stop="goUser(post.user_id)" :style="post.userAvatarUrl ? { backgroundImage: `url(${post.userAvatarUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}">
+              <span v-if="!post.userAvatarUrl">{{ post.userInitials }}</span>
+            </div>
             <div class="post-meta">
               <div class="post-username clickable" @click.stop="goUser(post.user_id)">{{ post.userName }}</div>
               <div class="post-time">{{ formatTime(post.created_at) }} · {{ post.userNim }}</div>
@@ -176,7 +182,9 @@
           <button class="modal-close" @click="showModal = false">✕</button>
         </div>
         <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1rem">
-          <div class="avatar">{{ user?.initials }}</div>
+          <div class="avatar" :style="user?.avatar_url ? { backgroundImage: `url(${user.avatar_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}">
+            <span v-if="!user?.avatar_url">{{ user?.initials }}</span>
+          </div>
           <div>
             <div style="font-weight: 700; font-size: 0.88rem">{{ user?.name }}</div>
             <div style="font-size: 0.75rem; color: var(--gray-muted)">{{ user?.nim }}</div>

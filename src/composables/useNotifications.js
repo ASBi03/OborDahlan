@@ -10,7 +10,7 @@ export function useNotifications() {
   async function fetchNotifications(userId) {
     const { data } = await supabase
       .from('notifications')
-      .select('*, actor:profiles!notifications_actor_id_fkey(name, initials)')
+      .select('*, actor:profiles!notifications_actor_id_fkey(name, initials, avatar_url)')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(30)
@@ -54,7 +54,7 @@ export function useNotifications() {
         async (payload) => {
           const { data: actor } = await supabase
             .from('profiles')
-            .select('name, initials')
+            .select('name, initials, avatar_url')
             .eq('id', payload.new.actor_id)
             .single()
 

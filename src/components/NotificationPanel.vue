@@ -15,7 +15,9 @@
         :class="{ unread: !n.read }"
         @click="handleClick(n)"
       >
-        <div class="notif-avatar">{{ n.actor?.initials }}</div>
+        <div class="notif-avatar" :style="n.actor?.avatar_url ? { backgroundImage: `url(${n.actor.avatar_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}">
+          <span v-if="!n.actor?.avatar_url">{{ n.actor?.initials }}</span>
+        </div>
         <div class="notif-body">
           <div class="notif-text" v-html="formatNotif(n)"></div>
           <div class="notif-time">{{ formatTime(n.created_at) }}</div>

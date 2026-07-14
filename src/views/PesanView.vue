@@ -28,7 +28,9 @@
         class="chat-item"
         @click="goChat(conv.id)"
       >
-        <div class="chat-avatar">{{ conv.otherUser?.initials }}</div>
+        <div class="chat-avatar" :style="conv.otherUser?.avatar_url ? { backgroundImage: `url(${conv.otherUser.avatar_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}">
+          <span v-if="!conv.otherUser?.avatar_url">{{ conv.otherUser?.initials }}</span>
+        </div>
         <div class="chat-info">
           <div class="chat-name">{{ conv.otherUser?.name }}</div>
           <div class="chat-preview">{{ conv.lastMessage || 'Mulai percakapan...' }}</div>
@@ -76,7 +78,9 @@
             class="search-result-item"
             @click="startChat(u.id)"
           >
-            <div class="chat-avatar" style="width: 38px; height: 38px; font-size: 0.78rem">{{ u.initials }}</div>
+            <div class="chat-avatar" style="width: 38px; height: 38px; font-size: 0.78rem" :style="u.avatar_url ? { backgroundImage: `url(${u.avatar_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}">
+              <span v-if="!u.avatar_url">{{ u.initials }}</span>
+            </div>
             <div class="chat-info">
               <div class="chat-name" style="font-size: 0.85rem">{{ u.name }}</div>
               <div class="chat-preview">{{ u.nim }}</div>

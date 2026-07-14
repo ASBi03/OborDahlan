@@ -42,7 +42,9 @@
           class="lowongan-card"
         >
           <div class="lowongan-header">
-            <div class="avatar">{{ item.posterInitials }}</div>
+            <div class="avatar" :style="item.posterAvatarUrl ? { backgroundImage: `url(${item.posterAvatarUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}">
+              <span v-if="!item.posterAvatarUrl">{{ item.posterInitials }}</span>
+            </div>
             <div class="post-meta">
               <div class="post-username">{{ item.company }}</div>
               <div class="post-time">Diposting oleh {{ item.posterName }} · {{ formatTime(item.created_at) }}</div>

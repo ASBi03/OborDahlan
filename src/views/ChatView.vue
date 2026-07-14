@@ -11,8 +11,9 @@
           class="chat-avatar"
           style="width: 32px; height: 32px; font-size: 0.78rem; margin-left: 0.4rem"
           v-if="otherUser"
+          :style="otherUser.avatar_url ? { backgroundImage: `url(${otherUser.avatar_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}"
         >
-          {{ otherUser.initials }}
+          <span v-if="!otherUser.avatar_url">{{ otherUser.initials }}</span>
         </div>
         <div class="nav-brand" style="margin-left: 0.5rem" v-if="otherUser">
           {{ otherUser.name }}
