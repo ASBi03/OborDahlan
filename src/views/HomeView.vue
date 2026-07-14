@@ -88,7 +88,7 @@
           </div>
           <div class="post-divider"></div>
           <p class="post-content">{{ post.content }}</p>
-          <div v-if="post.image" class="post-image"><span>📷 Foto</span></div>
+          <div v-if="post.image" class="post-image"><img :src="post.image" alt="Foto postingan" /></div>
           <div class="post-actions">
             <button
               class="action-btn"
@@ -188,9 +188,23 @@
           placeholder="Apa yang ingin kamu bagikan?"
           rows="4"
         ></textarea>
+        <div v-if="postImagePreview" class="post-image-preview">
+          <img :src="postImagePreview" alt="Preview" />
+          <button class="post-image-remove" @click="removePostImage">✕</button>
+        </div>
         <div class="modal-footer">
+          <button class="btn-upload-photo" @click="$refs.postImageInput.click()" title="Tambah Foto">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+              <circle cx="8.5" cy="8.5" r="1.5" />
+              <polyline points="21 15 16 10 5 21" />
+            </svg>
+          </button>
+          <input ref="postImageInput" type="file" accept="image/*" style="display:none" @change="handlePostImage" />
           <button class="btn-cancel" @click="showModal = false">Batal</button>
-          <button class="btn-post" @click="submitPost">Posting</button>
+          <button class="btn-post" @click="submitPost" :disabled="postUploading">
+            {{ postUploading ? 'Mengunggah...' : 'Posting' }}
+          </button>
         </div>
       </div>
     </div>
@@ -205,6 +219,7 @@ import { useAuth } from '@/composables/useAuth'
 import { usePosts } from '@/composables/usePosts'
 import { useChat } from '@/composables/useChat'
 import { useNotifications } from '@/composables/useNotifications'
+import { useUpload } from '@/composables/useUpload'
 import BottomNav from '@/components/BottomNav.vue'
 import NotificationBell from '@/components/NotificationBell.vue'
 import { WEATHER_API_KEY, WEATHER_CITY } from '@/data/store'
@@ -214,9 +229,13 @@ const { currentUser: user, fetchFollowCounts } = useAuth()
 const { posts, loading, fetchPosts, createPost, toggleLike } = usePosts()
 const { findOrCreateConversation } = useChat()
 const { createNotification } = useNotifications()
+const { uploadPostImage } = useUpload()
 
 const showModal = ref(false)
 const newPost = ref('')
+const postImageFile = ref(null)
+const postImagePreview = ref(null)
+const postUploading = ref(false)
 const followCounts = ref({ followers: 0, following: 0 })
 
 const weather = ref({
@@ -327,11 +346,37 @@ async function handleLike(post) {
 }
 
 async function submitPost() {
-  if (!newPost.value.trim() || !user.value) return
-  const post = await createPost(user.value.id, newPost.value)
-  posts.value.unshift(post)
-  newPost.value = ''
-  showModal.value = false
+  if ((!newPost.value.trim() && !postImageFile.value) || !user.value) return
+  postUploading.value = true
+  try {
+    let imageUrl = null
+    if (postImageFile.value) {
+      imageUrl = await uploadPostImage(user.value.id, postImageFile.value)
+    }
+    const post = await createPost(user.value.id, newPost.value, imageUrl)
+    posts.value.unshift(post)
+    newPost.value = ''
+    postImageFile.value = null
+    postImagePreview.value = null
+    showModal.value = false
+  } catch (err) {
+    console.error('Gagal posting:', err)
+  } finally {
+    postUploading.value = false
+  }
+}
+
+function handlePostImage(e) {
+  const file = e.target.files?.[0]
+  if (!file) return
+  postImageFile.value = file
+  postImagePreview.value = URL.createObjectURL(file)
+  e.target.value = ''
+}
+
+function removePostImage() {
+  postImageFile.value = null
+  postImagePreview.value = null
 }
 
 function goProfile() {

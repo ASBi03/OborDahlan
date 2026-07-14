@@ -131,10 +131,10 @@ export function usePosts() {
     }
   }
 
-  async function createPost(userId, content) {
+  async function createPost(userId, content, imageUrl = null) {
     const { data, error } = await supabase
       .from('posts')
-      .insert({ user_id: userId, content })
+      .insert({ user_id: userId, content, image: imageUrl })
       .select('*')
       .single()
 

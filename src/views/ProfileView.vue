@@ -28,7 +28,19 @@
     <div class="page-content">
       <div class="profile-cover"></div>
       <div class="profile-info-wrap main-layout" style="padding-top: 0">
-        <div class="profile-avatar-lg">{{ user?.initials }}</div>
+        <div class="avatar-upload-wrap" @click="$refs.avatarInput.click()">
+          <div class="profile-avatar-lg" :style="avatarUrl ? { backgroundImage: `url(${avatarUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}">
+            <span v-if="!avatarUrl">{{ user?.initials }}</span>
+          </div>
+          <div class="avatar-upload-overlay">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+              <circle cx="12" cy="13" r="4" />
+            </svg>
+          </div>
+          <input ref="avatarInput" type="file" accept="image/*" style="display:none" @change="handleAvatarUpload" />
+        </div>
+        <div v-if="avatarUploading" style="font-size: 0.78rem; color: var(--gray-muted); margin-top: 0.3rem">Mengunggah foto...</div>
         <div class="profile-name">{{ user?.name }}</div>
         <div class="profile-nim">
           <span v-if="user?.nim">NIM: {{ user.nim }}</span>
@@ -150,17 +162,21 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
 import { usePosts } from '@/composables/usePosts'
+import { useUpload } from '@/composables/useUpload'
 import BottomNav from '@/components/BottomNav.vue'
 
 const router = useRouter()
 const { currentUser: user, logout, fetchFollowCounts, updateProfile } = useAuth()
 const { posts, toggleLike, fetchPosts } = usePosts()
+const { uploadAvatar } = useUpload()
 
 const followCounts = ref({ followers: 0, following: 0 })
 const showEdit = ref(false)
 const editSaving = ref(false)
 const editError = ref('')
 const editSuccess = ref(false)
+const avatarUploading = ref(false)
+const avatarUrl = ref(null)
 
 const editForm = ref({ name: '', nim: '', jurusan: '', angkatan: '' })
 
@@ -198,7 +214,33 @@ async function loadFollowCounts() {
 onMounted(async () => {
   await fetchPosts(user.value?.id)
   await loadFollowCounts()
+  loadAvatar()
 })
+
+function loadAvatar() {
+  if (!user.value) return
+  const { data } = supabase.storage
+    .from('avatars')
+    .getPublicUrl(`${user.value.id}/avatar.jpg`)
+  if (data?.publicUrl) {
+    avatarUrl.value = data.publicUrl + '?t=' + Date.now()
+  }
+}
+
+async function handleAvatarUpload(e) {
+  const file = e.target.files?.[0]
+  if (!file || !user.value) return
+  avatarUploading.value = true
+  try {
+    const url = await uploadAvatar(user.value.id, file)
+    avatarUrl.value = url + '?t=' + Date.now()
+  } catch (err) {
+    console.error('Gagal upload avatar:', err)
+  } finally {
+    avatarUploading.value = false
+    e.target.value = ''
+  }
+}
 
 watch(user, async () => {
   await loadFollowCounts()

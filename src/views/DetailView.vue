@@ -47,7 +47,7 @@
         </div>
         <div class="post-divider"></div>
         <p class="post-content">{{ post.content }}</p>
-        <div v-if="post.image" class="post-image"><span>📷 Foto</span></div>
+        <div v-if="post.image" class="post-image"><img :src="post.image" alt="Foto postingan" /></div>
         <div class="post-actions">
           <button class="action-btn" :class="{ liked: post.liked }" @click="handleLike">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
