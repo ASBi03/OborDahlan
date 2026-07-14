@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { supabase } from '@/utils/supabase'
+import { supabase } from '@/lib/supabase'
 
 const currentUser = ref(null)
 const loading = ref(true)

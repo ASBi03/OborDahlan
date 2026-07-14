@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { supabase } from '@/utils/supabase'
+import { supabase } from '@/lib/supabase'
 
 export function useChat() {
   const conversations = ref([])
@@ -148,42 +148,14 @@ export function useChat() {
   }
 
   async function findOrCreateConversation(userId, recipientId) {
-    try {
-      const { data: userMemberships } = await supabase
-        .from('conversation_members')
-        .select('conversation_id')
-        .eq('user_id', userId)
+    const { data, error } = await supabase.rpc('find_or_create_conversation', {
+      p_user_id: userId,
+      p_recipient_id: recipientId,
+    })
 
-      if (userMemberships && userMemberships.length > 0) {
-        const convIds = userMemberships.map((e) => e.conversation_id)
+    if (error) throw error
 
-        const { data: mutual } = await supabase
-          .from('conversation_members')
-          .select('conversation_id')
-          .in('conversation_id', convIds)
-          .eq('user_id', recipientId)
-          .limit(1)
-
-        if (mutual && mutual.length > 0) return mutual[0].conversation_id
-      }
-    } catch (err) {
-      console.warn('Error checking existing conversation:', err)
-    }
-
-    const { data: newConv, error: convError } = await supabase
-      .from('conversations')
-      .insert({})
-      .select('id')
-      .single()
-
-    if (convError) throw convError
-
-    await supabase.from('conversation_members').insert([
-      { conversation_id: newConv.id, user_id: userId },
-      { conversation_id: newConv.id, user_id: recipientId },
-    ])
-
-    return newConv.id
+    return data
   }
 
   async function searchUsers(query, currentUserId) {

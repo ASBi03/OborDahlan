@@ -103,8 +103,10 @@ onMounted(async () => {
   scrollToBottom()
 
   channel = subscribeToMessages(convId, (payload) => {
-    messages.value.push(payload.new)
-    scrollToBottom()
+    if (payload.new.sender_id !== user.value?.id) {
+      messages.value.push(payload.new)
+      scrollToBottom()
+    }
   })
 })
 
@@ -114,10 +116,16 @@ onUnmounted(() => {
 
 async function sendMsg() {
   if (!newMsg.value.trim() || !user.value) return
-  const msg = await sendMessage(route.params.id, user.value.id, newMsg.value)
-  messages.value.push(msg)
+  const text = newMsg.value
   newMsg.value = ''
-  scrollToBottom()
+  try {
+    const msg = await sendMessage(route.params.id, user.value.id, text)
+    messages.value.push(msg)
+    scrollToBottom()
+  } catch (err) {
+    console.error('Gagal kirim pesan:', err)
+    newMsg.value = text
+  }
 }
 
 function goBack() {

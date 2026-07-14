@@ -17,22 +17,32 @@
 
     <div class="page-content main-layout" v-else-if="post">
       <div class="post-card">
-        <div class="post-header">
-          <div class="avatar">{{ post.userInitials }}</div>
-          <div class="post-meta">
-            <div class="post-username">{{ post.userName }}</div>
-            <div class="post-time">{{ formatTime(post.created_at) }} · {{ post.userNim }}</div>
-          </div>
-          <button
-            v-if="post.user_id !== user?.id"
-            class="action-btn"
-            @click="startChat"
-            style="margin-left: auto"
-          >
+          <div class="post-header">
+            <div class="avatar clickable" @click.stop="goUser(post.user_id)">{{ post.userInitials }}</div>
+            <div class="post-meta">
+              <div class="post-username clickable" @click.stop="goUser(post.user_id)">{{ post.userName }}</div>
+              <div class="post-time">{{ formatTime(post.created_at) }} · {{ post.userNim }}</div>
+            </div>
+            <button
+              v-if="post.user_id !== user?.id"
+              class="btn-follow-sm"
+              :class="{ 'btn-following-sm': isFollowingUser }"
+              @click.stop="handleFollow"
+              :disabled="followLoading"
+            >
+              {{ isFollowingUser ? 'Mengikuti' : 'Ikuti' }}
+            </button>
+            <button
+              v-if="post.user_id !== user?.id"
+              class="action-btn btn-msg"
+              @click="startChat"
+              style="margin-left: auto"
+            >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              <line x1="22" y1="2" x2="11" y2="13" />
+              <polygon points="22 2 15 22 11 13 2 9 22 2" />
             </svg>
-            Kirim Pesan
+            <span class="btn-text">Kirim Pesan</span>
           </button>
         </div>
         <div class="post-divider"></div>
@@ -132,13 +142,15 @@ import { useChat } from '@/composables/useChat'
 
 const router = useRouter()
 const route = useRoute()
-const { currentUser: user } = useAuth()
+const { currentUser: user, isFollowing, toggleFollow } = useAuth()
 const { fetchPost, toggleLike, addComment, deleteComment } = usePosts()
 const { findOrCreateConversation } = useChat()
 
 const post = ref(null)
 const loading = ref(true)
 const newComment = ref('')
+const isFollowingUser = ref(false)
+const followLoading = ref(false)
 
 function formatTime(dateStr) {
   if (!dateStr) return ''
@@ -158,6 +170,9 @@ function formatTime(dateStr) {
 onMounted(async () => {
   try {
     post.value = await fetchPost(route.params.id, user.value?.id)
+    if (post.value && user.value && post.value.user_id !== user.value.id) {
+      isFollowingUser.value = await isFollowing(post.value.user_id)
+    }
   } catch (err) {
     console.error(err)
   } finally {
@@ -182,6 +197,24 @@ async function submitComment() {
 
 function goBack() {
   router.push('/home')
+}
+function goUser(id) {
+  if (id === user.value?.id) {
+    router.push('/profil')
+  } else {
+    router.push('/user/' + id)
+  }
+}
+async function handleFollow() {
+  if (!user.value || !post.value) return
+  followLoading.value = true
+  try {
+    isFollowingUser.value = await toggleFollow(post.value.user_id)
+  } catch (err) {
+    console.error(err)
+  } finally {
+    followLoading.value = false
+  }
 }
 async function handleDeleteComment(commentId) {
   await deleteComment(commentId)

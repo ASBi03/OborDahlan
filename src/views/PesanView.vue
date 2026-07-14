@@ -137,12 +137,14 @@ function handleSearch() {
   clearTimeout(searchTimeout)
   searchLoading.value = true
   searchTimeout = setTimeout(async () => {
+    if (!user.value) { searchLoading.value = false; return }
     searchResults.value = await searchUsers(searchQuery.value, user.value.id)
     searchLoading.value = false
   }, 300)
 }
 
 async function startChat(recipientId) {
+  if (!user.value) return
   const convId = await findOrCreateConversation(user.value.id, recipientId)
   closeNewChat()
   router.push('/pesan/' + convId)

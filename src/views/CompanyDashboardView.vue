@@ -163,7 +163,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
 import { useLowongan } from '@/composables/useLowongan'
-import { supabase } from '@/utils/supabase'
+import { supabase } from '@/lib/supabase'
 
 const router = useRouter()
 const { currentUser: user, logout } = useAuth()

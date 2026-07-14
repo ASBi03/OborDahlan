@@ -78,9 +78,9 @@
           @click="goDetail(post.id)"
         >
           <div class="post-header">
-            <div class="avatar">{{ post.userInitials }}</div>
+            <div class="avatar clickable" @click.stop="goUser(post.user_id)">{{ post.userInitials }}</div>
             <div class="post-meta">
-              <div class="post-username">{{ post.userName }}</div>
+              <div class="post-username clickable" @click.stop="goUser(post.user_id)">{{ post.userName }}</div>
               <div class="post-time">{{ formatTime(post.created_at) }} · {{ post.userNim }}</div>
             </div>
             <button class="post-more" @click.stop>⋯</button>
@@ -105,7 +105,7 @@
               </svg>
               {{ post.commentCount }}
             </button>
-            <button class="action-btn" @click.stop>
+            <button class="action-btn btn-share" @click.stop>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="18" cy="5" r="3" />
                 <circle cx="6" cy="12" r="3" />
@@ -113,17 +113,18 @@
                 <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
                 <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
               </svg>
-              Bagikan
+              <span class="btn-text">Bagikan</span>
             </button>
             <button
               v-if="post.user_id !== user?.id"
-              class="action-btn"
+              class="action-btn btn-msg"
               @click.stop="startChat(post.user_id)"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                <line x1="22" y1="2" x2="11" y2="13" />
+                <polygon points="22 2 15 22 11 13 2 9 22 2" />
               </svg>
-              Kirim Pesan
+              <span class="btn-text">Kirim Pesan</span>
             </button>
           </div>
         </div>
@@ -328,6 +329,13 @@ async function submitPost() {
 
 function goProfile() {
   router.push('/profil')
+}
+function goUser(id) {
+  if (id === user.value?.id) {
+    router.push('/profil')
+  } else {
+    router.push('/user/' + id)
+  }
 }
 function goPesan() {
   router.push('/pesan')

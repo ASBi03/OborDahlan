@@ -835,6 +835,74 @@ body {
   color: #a32d2d;
 }
 
+/* Follow buttons */
+.btn-follow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.4rem;
+  border-radius: 50px;
+  border: none;
+  background: var(--green-dark);
+  color: white;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-follow:hover { background: #145225; }
+.btn-follow:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-following {
+  background: white;
+  color: var(--gray-text);
+  border: 1.5px solid var(--gray-border);
+}
+.btn-following:hover { background: var(--gray-bg); }
+.btn-follow-sm {
+  padding: 0.3rem 0.8rem;
+  border-radius: 50px;
+  border: 1.5px solid var(--green-dark);
+  background: white;
+  color: var(--green-dark);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.btn-follow-sm:hover { background: var(--green-dark); color: white; }
+.btn-following-sm {
+  background: var(--gray-bg);
+  border-color: var(--gray-border);
+  color: var(--gray-muted);
+}
+.btn-following-sm:hover { background: #e8e8e4; color: var(--gray-text); }
+.btn-msg-profile {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.4rem;
+  border-radius: 50px;
+  border: 1.5px solid var(--gray-border);
+  background: white;
+  color: var(--gray-text);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-msg-profile:hover { background: var(--gray-bg); border-color: var(--green-mid); }
+.profile-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+.clickable { cursor: pointer; }
+.clickable:hover { opacity: 0.8; }
+
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -1308,6 +1376,26 @@ body {
   }
   .home-feed {
     padding-bottom: 80px;
+  }
+  .btn-share .btn-text,
+  .btn-msg .btn-text {
+    display: none;
+  }
+  .btn-share,
+  .btn-msg {
+    padding: 0.4rem 0.55rem;
+  }
+  .profile-actions {
+    flex-wrap: wrap;
+  }
+  .profile-actions .btn-follow,
+  .profile-actions .btn-msg-profile {
+    flex: 1;
+    justify-content: center;
+    font-size: 0.8rem;
+  }
+  .btn-text-msg {
+    display: none;
   }
 }
 

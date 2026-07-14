@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { supabase } from '@/utils/supabase'
+import { supabase } from '@/lib/supabase'
 
 export function useLowongan() {
   const lowongan = ref([])
