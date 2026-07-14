@@ -29,7 +29,7 @@
               <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
               <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
             </svg>
-            Perusahaan
+            Mitra
           </button>
         </div>
 
@@ -123,7 +123,7 @@ async function handleLogin() {
       throw new Error('Email harus @webmail.uad.ac.id untuk login sebagai Mahasiswa')
     }
     if (role.value === 'perusahaan' && emailRole !== 'perusahaan') {
-      throw new Error('Gunakan email selain @webmail.uad.ac.id untuk login sebagai Perusahaan')
+      throw new Error('Gunakan email selain @webmail.uad.ac.id untuk login sebagai Mitra')
     }
 
     await login(email.value, password.value)
