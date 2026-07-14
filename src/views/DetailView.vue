@@ -139,12 +139,14 @@ import { useRouter, useRoute } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
 import { usePosts } from '@/composables/usePosts'
 import { useChat } from '@/composables/useChat'
+import { useNotifications } from '@/composables/useNotifications'
 
 const router = useRouter()
 const route = useRoute()
 const { currentUser: user, isFollowing, toggleFollow } = useAuth()
 const { fetchPost, toggleLike, addComment, deleteComment } = usePosts()
 const { findOrCreateConversation } = useChat()
+const { createNotification } = useNotifications()
 
 const post = ref(null)
 const loading = ref(true)
@@ -185,6 +187,9 @@ async function handleLike() {
   const newLiked = await toggleLike(post.value.id, user.value.id)
   post.value.liked = newLiked
   post.value.likeCount += newLiked ? 1 : -1
+  if (newLiked) {
+    createNotification(post.value.user_id, user.value.id, 'like', post.value.id)
+  }
 }
 
 async function submitComment() {
@@ -193,6 +198,7 @@ async function submitComment() {
   post.value.comments.push(comment)
   post.value.commentCount++
   newComment.value = ''
+  createNotification(post.value.user_id, user.value.id, 'comment', post.value.id)
 }
 
 function goBack() {

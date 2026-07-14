@@ -10,12 +10,13 @@
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
           </svg>
         </button>
-        <button class="nav-icon-btn" title="Notifikasi">
+        <button class="nav-icon-btn" @click="goLowongan" title="Lowongan">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
           </svg>
         </button>
+        <NotificationBell />
         <button class="nav-icon-btn" @click="goProfile">
           <span style="font-size: 0.75rem; font-weight: 700">{{ user?.initials }}</span>
         </button>
@@ -47,7 +48,7 @@
         <div class="sidebar-card" style="padding: 0.6rem 0.5rem">
           <button class="sb-nav-btn active"><span class="sb-nav-icon">🏠</span> Beranda</button>
           <button class="sb-nav-btn" @click="goPesan"><span class="sb-nav-icon">💬</span> Pesan</button>
-          <button class="sb-nav-btn"><span class="sb-nav-icon">🔍</span> Cari</button>
+          <button class="sb-nav-btn" @click="goLowongan"><span class="sb-nav-icon">💼</span> Lowongan</button>
           <button class="sb-nav-btn" @click="goProfile"><span class="sb-nav-icon">👤</span> Profil Saya</button>
           <button class="sb-nav-btn"><span class="sb-nav-icon">🔔</span> Notifikasi</button>
           <button class="sb-nav-btn"><span class="sb-nav-icon">📌</span> Tersimpan</button>
@@ -203,13 +204,16 @@ import { useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
 import { usePosts } from '@/composables/usePosts'
 import { useChat } from '@/composables/useChat'
+import { useNotifications } from '@/composables/useNotifications'
 import BottomNav from '@/components/BottomNav.vue'
+import NotificationBell from '@/components/NotificationBell.vue'
 import { WEATHER_API_KEY, WEATHER_CITY } from '@/data/store'
 
 const router = useRouter()
 const { currentUser: user, fetchFollowCounts } = useAuth()
 const { posts, loading, fetchPosts, createPost, toggleLike } = usePosts()
 const { findOrCreateConversation } = useChat()
+const { createNotification } = useNotifications()
 
 const showModal = ref(false)
 const newPost = ref('')
@@ -317,6 +321,9 @@ async function handleLike(post) {
   const newLiked = await toggleLike(post.id, user.value.id)
   post.liked = newLiked
   post.likeCount += newLiked ? 1 : -1
+  if (newLiked) {
+    createNotification(post.user_id, user.value.id, 'like', post.id)
+  }
 }
 
 async function submitPost() {
@@ -339,6 +346,9 @@ function goUser(id) {
 }
 function goPesan() {
   router.push('/pesan')
+}
+function goLowongan() {
+  router.push('/lowongan')
 }
 function goDetail(id) {
   router.push('/post/' + id)

@@ -89,6 +89,17 @@ CREATE TABLE IF NOT EXISTS messages (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- 10. Notifications
+CREATE TABLE IF NOT EXISTS notifications (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  actor_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  type TEXT NOT NULL,
+  post_id UUID REFERENCES posts(id) ON DELETE CASCADE,
+  read BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- ============================================
 -- Indexes for performance
 -- ============================================
@@ -107,6 +118,8 @@ CREATE INDEX IF NOT EXISTS idx_messages_conversation_id ON messages(conversation
 CREATE INDEX IF NOT EXISTS idx_messages_created_at ON messages(created_at);
 CREATE INDEX IF NOT EXISTS idx_conversation_members_user_id ON conversation_members(user_id);
 CREATE INDEX IF NOT EXISTS idx_conversation_members_conv_id ON conversation_members(conversation_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_created_at ON notifications(created_at DESC);
 
 -- ============================================
 -- Row Level Security (RLS) Policies
@@ -121,6 +134,7 @@ ALTER TABLE lowongan ENABLE ROW LEVEL SECURITY;
 ALTER TABLE conversations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE conversation_members ENABLE ROW LEVEL SECURITY;
 ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 
 -- Profiles: anyone can read, only owner can update
 CREATE POLICY "Profiles are viewable by everyone" ON profiles FOR SELECT USING (true);
@@ -190,6 +204,14 @@ CREATE POLICY "Members can send messages" ON messages
       WHERE conversation_id = messages.conversation_id
     )
   );
+
+-- Notifications: owner can read/update, anyone authenticated can insert
+CREATE POLICY "Users can view own notifications" ON notifications
+  FOR SELECT USING (user_id = auth.uid());
+CREATE POLICY "Users can update own notifications" ON notifications
+  FOR UPDATE USING (user_id = auth.uid());
+CREATE POLICY "Authenticated users can create notifications" ON notifications
+  FOR INSERT WITH CHECK (auth.uid() = actor_id);
 
 -- ============================================
 -- Function: auto-create profile on signup

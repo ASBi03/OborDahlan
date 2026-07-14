@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
+import { useNotifications } from '@/composables/useNotifications'
 
 export function useChat() {
   const conversations = ref([])
@@ -133,6 +134,17 @@ export function useChat() {
       .single()
 
     if (error) throw error
+
+    const { createNotification } = useNotifications()
+    const { data: member } = await supabase
+      .from('conversation_members')
+      .select('user_id')
+      .eq('conversation_id', conversationId)
+      .neq('user_id', senderId)
+      .limit(1)
+    if (member && member[0]) {
+      createNotification(member[0].user_id, senderId, 'message')
+    }
 
     const { data: profile } = await supabase
       .from('profiles')

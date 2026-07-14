@@ -1547,3 +1547,118 @@ body {
     padding: 2rem 1.5rem;
   }
 }
+
+/* Notification bell */
+.notif-bell-wrap {
+  position: relative;
+}
+.notif-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: var(--red);
+  color: white;
+  font-size: 0.6rem;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+/* Notification panel */
+.notif-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 340px;
+  max-height: 420px;
+  background: white;
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  border: 1px solid var(--gray-border);
+  z-index: 300;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.notif-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--gray-border);
+}
+.notif-header h4 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin: 0;
+}
+.notif-mark-all {
+  background: none;
+  border: none;
+  color: var(--green-dark);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.notif-mark-all:hover { text-decoration: underline; }
+.notif-empty {
+  padding: 2rem;
+  text-align: center;
+  color: var(--gray-muted);
+  font-size: 0.85rem;
+}
+.notif-list {
+  overflow-y: auto;
+  flex: 1;
+}
+.notif-item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+  transition: background 0.12s;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+}
+.notif-item:hover { background: var(--gray-bg); }
+.notif-item.unread { background: #f0f7f2; }
+.notif-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--green-dark);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.notif-body { flex: 1; min-width: 0; }
+.notif-text {
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--gray-text);
+}
+.notif-text strong { font-weight: 700; }
+.notif-time {
+  font-size: 0.7rem;
+  color: var(--gray-muted);
+  margin-top: 2px;
+}
+
+@media (max-width: 500px) {
+  .notif-panel {
+    width: calc(100vw - 2rem);
+    right: -0.5rem;
+  }
+}

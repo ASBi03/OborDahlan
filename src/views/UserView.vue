@@ -118,12 +118,14 @@ import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/composables/useAuth'
 import { usePosts } from '@/composables/usePosts'
 import { useChat } from '@/composables/useChat'
+import { useNotifications } from '@/composables/useNotifications'
 
 const router = useRouter()
 const route = useRoute()
 const { currentUser: user, fetchFollowCounts, isFollowing, toggleFollow } = useAuth()
 const { posts, toggleLike, fetchPosts } = usePosts()
 const { findOrCreateConversation } = useChat()
+const { createNotification } = useNotifications()
 
 const profileUser = ref(null)
 const loading = ref(true)
@@ -166,6 +168,9 @@ async function handleFollow() {
     const result = await toggleFollow(route.params.id)
     isFollowingUser.value = result
     followCounts.value.followers += result ? 1 : -1
+    if (result) {
+      createNotification(route.params.id, user.value.id, 'follow')
+    }
   } catch (err) {
     console.error(err)
   } finally {
